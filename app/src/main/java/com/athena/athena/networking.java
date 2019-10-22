@@ -9,16 +9,24 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +48,8 @@ public class networking extends Activity{
     Context apcontext;
 
     View base;
+
+    TextView eventview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -95,43 +105,66 @@ public class networking extends Activity{
                 Log.d(TAG, "call: " + Arrays.toString(args));
                 int i;
                 for (i=0; i<args.length; ++i){
-                    Map<String, String> outmap = new HashMap<String, String>();
                     Log.d(TAG, "call: " + args[i].toString());
                     String command = args[i].toString();
-                    JSONObject object = parseJSON(command);
-                    Iterator<String> keys = object.keySet().iterator();
-                    for (Iterator iterator = object.keySet().iterator(); iterator.hasNext();){
-                        String key = (String)iterator.next();
-                        Log.d(TAG, "call: currently working on: " + key);
-                        if (key.equals("motd")){
-                            Log.d(TAG, object.get(key).toString());
-                            JSONObject contents = parseJSON(object.get(key).toString());
-                            Log.d(TAG, "call: weather key");
-                            Log.d(TAG, contents.get("weather").toString());
-                            Log.d(TAG, contents.get("agenda").toString());
+                    Map<String, Object> response = parseJSON(command);
+                    Log.d(TAG, "call: " + response.toString());
+                    Log.d(TAG, "call: " + response.keySet().toString());
+                    Iterator keys = response.entrySet().iterator();
+                    while (keys.hasNext()) {
+                        Map.Entry entry = (Map.Entry) keys.next();
+                        String key = (String) entry.getKey();
+                        Object value = entry.getValue();
+                        Log.d(TAG, "call: Key = " + key + ", Value = " + value.toString());
+                        if (key.equals("motd")) {
+                            try {
+                                Map<String, Object> motd = parseJSON(new ObjectMapper().writeValueAsString(response.get("motd")));
+                                Log.d(TAG, "call: motd" + motd.toString());
+
+                                final Map<String, Object> agenda = parseJSON(new ObjectMapper().writeValueAsString(motd.get("agenda")));
+                                String weather = motd.get("weather").toString();
+                                Log.d(TAG, "call: agenda" + agenda.toString());
+                                Log.d(TAG, "call: agenda" + agenda.get("event"));
+                                Log.d(TAG, "call: weather " + weather);
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        eventview.setText(agenda.get("event").toString());
+                                        Log.d(TAG, "run: DONE UPDATING!");
+                                    }
+                                });
+                            } catch (Exception e) {
+                                Log.e(TAG, "call: " + e.getMessage() + e.getCause());
+                            }
                         }
                     }
+
                 }
             }
         });
     }
     public static void send(String key, Object value) {
             JSONObject obj = new JSONObject();
-            obj.put(key, value);
+            try {
+                obj.put(key, value);
+            }catch (JSONException e){
+                Log.e(TAG, e.getMessage() );
+            }
             socket.emit("message", obj.toString());
     }
 
-    public JSONObject parseJSON(String command){
-        JSONObject object = new JSONObject();
-        JSONParser parser = new JSONParser();
-        try {
-            object = (JSONObject) parser.parse(command);
-            return object;
-        }catch (ParseException e){
-            Log.e(TAG, "parseJSON: "+e.getMessage().toString() );
-            object.put("Failure", e.getMessage());
+    public Map<String, Object> parseJSON(String command){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
-        }
-        return object;
+        Map<String, Object> response = null;
+        try {
+            response = mapper.readValue(command, HashMap.class);
+        }catch (IOException e ){
+            Log.d(TAG, "parseJSON: " + e.getMessage());
+            response.put("hey", "there");
+            }
+        return response;
     }
 }

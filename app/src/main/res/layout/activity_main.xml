@@ -59,15 +59,21 @@
         app:layout_constraintVertical_bias="0.35" />
 
     <!-- rect calendar -->
-    <View
+    <HorizontalScrollView
         android:id="@+id/rect_calend"
-        android:tag="calendar"
         android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="210dp"
+        android:layout_marginTop="253dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="470dp"
         android:background="@drawable/rect_left"
         android:elevation="4dp"
+        android:tag="calendar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -125,6 +131,34 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
+    <!-- panel right -->
+    <View
+        android:id="@+id/vector"
+        android:layout_width="330dp"
+        android:layout_height="600dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-4dp"
+        android:background="@drawable/panel_right"
+        />
 
+
+    <TextView
+        android:id="@+id/text_calend"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="10dp"
+        android:text="calendar"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/rect_calend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/rect_calend"
+        app:layout_constraintTop_toTopOf="@+id/rect_calend"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="calendar" />
 </android.support.constraint.ConstraintLayout>
 
