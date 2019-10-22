@@ -131,18 +131,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
-    <!-- panel right -->
-    <View
-        android:id="@+id/vector"
-        android:layout_width="330dp"
-        android:layout_height="600dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="30dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="-4dp"
-        android:background="@drawable/panel_right"
-        />
-
 
     <TextView
         android:id="@+id/text_calend"

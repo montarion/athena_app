@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
         View transitview = findViewById(R.id.rect_transi);
         View newsview = findViewById(R.id.rect_news);
         TextView event = findViewById(R.id.text_calend);
-        gestureDetector = new GestureDetector(this, new MyGestureListener());
         backview.setOnTouchListener(touchListener);
         baseview.setOnTouchListener(touchListener);
         weatherview.setOnTouchListener(touchListener);
@@ -48,126 +47,34 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            vTouch = v;
-            return gestureDetector.onTouchEvent(event);
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        float dX, dY;
 
+        public boolean onTouch(View v, MotionEvent event) {
+            String name = v.getTag().toString();
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            Log.d(TAG, "onTouch: " + event.toString());
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    Log.i("TAG", "touched down");
+                    dX = v.getX() - event.getRawX();
+                    dY = v.getY() - event.getRawY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    Log.i("TAG", String.format("moving in %s: v(%d, %d)", name, x, y));
+                    v.animate()
+                            .x(event.getRawX() + dX - (v.getWidth() / 100))
+                            .setDuration(1)
+                            .start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    Log.i("TAG", "touched up");
+                    break;
+            }
+
+            return true;
         }
     };
-
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
-
-        public static final int SWIPE_THRESHOLD = 100;
-        public static final int SWIPE_VELOCITY_THRESHOLD = 500;
-        String direction = "";
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d("TAG","onDown: ");
-
-            // don't return false here or else none of the other
-            // gestures will work
-            return true;
-        }
-
-        public boolean swipehandler(String direction, float velocity) {
-            String name = vTouch.getTag().toString();
-            int maxval = 0;
-            int minval = 0;
-            int rightlongmax = 600;
-            int leftlongmin = -600;
-            int rightshortmax = 800;
-            int leftshortmin = -800;
-            Log.d(TAG, "swipehandler: view " + name + " got an " + direction + "ward swipe with velocity: " + velocity + "!");
-            if (direction.equals("right")){
-                if (name.equals("weather")){
-                    Log.d(TAG, "swipehandler: Expanding weather");
-                    maxval = rightshortmax;
-                } else if (name.equals("anime")){
-                    Log.d(TAG, "swipehandler: Expanding anime");
-                    maxval = rightlongmax;
-                }
-
-            }
-            if (direction.equals("left")){
-                if (name.equals("calendar")){
-                    Log.d(TAG, "swipehandler: Expanding calendar");
-                    minval = leftlongmin;
-                } else if (name.equals("transit")){
-                    Log.d(TAG, "swipehandler: Expanding transit");
-                    minval = leftshortmin;
-                }
-            }
-            if (direction.equals("up")){
-                if (name.equals("news")){
-                    Log.d(TAG, "swipehandler: Expanding news");
-                }
-                //TODO: implement gesture control for standard scrolling of base/background
-            }
-            FlingAnimation fling = null;
-            vTouch.setElevation(8);
-            if (name.equals("base") || name.equals("background") || name.equals("news")) {
-                fling = new FlingAnimation(findViewById(vTouch.getId()), DynamicAnimation.TRANSLATION_Y);
-                fling.setStartVelocity(velocity)
-                        .setFriction(1.1f)
-                        .setMinimumVisibleChange(DynamicAnimation.MIN_VISIBLE_CHANGE_SCALE)
-                        .start();
-            }else{
-                fling = new FlingAnimation(findViewById(vTouch.getId()), DynamicAnimation.TRANSLATION_X);
-                fling.setStartVelocity(velocity)
-                        .setFriction(1.1f)
-                        .setStartValue(0)
-                        .setMinValue(minval)
-                        .setMaxValue(maxval)
-                        .setMinimumVisibleChange(DynamicAnimation.MIN_VISIBLE_CHANGE_SCALE)
-                        .start();
-            }
-
-
-
-            Log.d(TAG, "swipehandler: " + fling.toString());
-
-            return true;
-        }
-        @Override
-        public boolean onFling(MotionEvent downEvent, MotionEvent moveEvent, float velocityX, float velocityY) {
-            Log.d(TAG, "onFling: did it!");
-            float diffX = moveEvent.getX() - downEvent.getX();
-            float diffY = moveEvent.getY() - downEvent.getY();
-            int id = vTouch.getId();
-            // which one is greater? movement across x or y?
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                //left of right swipe
-                if(Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD){
-                    if (diffX > 0) {
-                        direction = "right";
-                        Boolean result = swipehandler(direction, velocityX);
-                        return result;
-                    } else {
-                        direction = "left";
-                        Boolean result = swipehandler(direction, velocityX);
-                        return result;
-                    }
-                }
-            } else{
-                //up or down
-                if(Math.abs(diffY) >SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD){
-                    if (diffY > 0){
-                        direction = "down";
-                        Boolean result = swipehandler(direction, velocityY);
-                        return result;
-                    } else {
-                        direction = "up";
-                        Boolean result = swipehandler(direction, velocityX);
-                        return result;
-                    }
-                }
-            }
-
-            return false;
-        }
-    }
 
 }
