@@ -12,6 +12,7 @@
     <!-- rect background -->
     <View
         android:id="@+id/rect_backgr"
+        android:tag="background"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentStart="true"
@@ -27,6 +28,7 @@
     <!-- rect base -->
     <View
         android:id="@+id/rect_base"
+        android:tag="base"
         android:layout_width="fill_parent"
         android:layout_height="448dp"
         android:layout_alignParentStart="true"
@@ -42,6 +44,7 @@
     <!-- rect weather -->
     <View
         android:id="@+id/rect_weathe"
+        android:tag="weather"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentTop="true"
@@ -58,6 +61,7 @@
     <!-- rect calendar -->
     <View
         android:id="@+id/rect_calend"
+        android:tag="calendar"
         android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_alignParentStart="true"
@@ -72,10 +76,9 @@
         app:layout_constraintVertical_bias="0.35" />
 
     <!-- rect anime -->
-
-    <!-- rect transit -->
     <View
         android:id="@+id/rect_anime"
+        android:tag="anime"
         android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_alignParentLeft="true"
@@ -89,10 +92,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.70" />
 
-    <!-- rect news -->
-
+    <!-- rect transit -->
     <View
         android:id="@+id/rect_transi"
+        android:tag="transit"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentTop="true"
@@ -106,8 +109,10 @@
         app:layout_constraintTop_toTopOf="@+id/rect_backgr"
         app:layout_constraintVertical_bias="0.70" />
 
+    <!-- rect news -->
     <View
         android:id="@+id/rect_news"
+        android:tag="news"
         android:layout_width="300dp"
         android:layout_height="100dp"
         android:layout_alignParentTop="true"
