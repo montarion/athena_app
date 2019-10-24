@@ -77,10 +77,9 @@ public class calendarActivity extends AppCompatActivity {
     }
     public String parseTime(String time){
         Log.i(TAG, "parseTime: time: " + time);
-        //TODO: make this parse correctly! day of the week is wrong, as is the timezone..(it's converting when it shouldn't, and disregards the year)
-        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ssX");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
         dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
-        Date convertedDate = new Date();
+        Date convertedDate;
         String finalDateString = "";
         try {
             convertedDate = dateFormat.parse(time);
