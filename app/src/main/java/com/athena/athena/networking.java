@@ -2,6 +2,7 @@ package com.athena.athena;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -50,6 +51,10 @@ public class networking extends Activity{
     View base;
 
     TextView eventview;
+
+    calendarActivity calendar;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -120,12 +125,17 @@ public class networking extends Activity{
                             try {
                                 Map<String, Object> motd = parseJSON(new ObjectMapper().writeValueAsString(response.get("motd")));
                                 Log.d(TAG, "call: motd" + motd.toString());
-
+                                Log.e(TAG, "call: THING: " + maptoJSON(response.get("motd")));
+                                editor.putString("agenda", maptoJSON(motd.get("agenda")));
+                                editor.commit();
                                 final Map<String, Object> agenda = parseJSON(new ObjectMapper().writeValueAsString(motd.get("agenda")));
                                 String weather = motd.get("weather").toString();
                                 Log.d(TAG, "call: agenda" + agenda.toString());
                                 Log.d(TAG, "call: agenda" + agenda.get("event"));
                                 Log.d(TAG, "call: weather " + weather);
+                                //calendar.agenda = agenda;
+
+
                                 runOnUiThread(new Runnable() {
 
                                     @Override
@@ -134,8 +144,9 @@ public class networking extends Activity{
                                         Log.d(TAG, "run: DONE UPDATING!");
                                     }
                                 });
+
                             } catch (Exception e) {
-                                Log.e(TAG, "call: " + e.getMessage() + e.getCause());
+                                Log.e(TAG, "call error: " + e.getMessage() + e.getCause());
                             }
                         }
                     }
@@ -167,4 +178,19 @@ public class networking extends Activity{
             }
         return response;
     }
+
+    public String maptoJSON(Object command){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+
+        String response = "null";
+        try {
+            response = mapper.writeValueAsString(command);
+            Log.d(TAG, "maptoJSON() returned: " + response);
+        }catch (IOException e ){
+            Log.d(TAG, "parseJSON: " + e.getMessage());
+        }
+        return response;
+    }
+
 }

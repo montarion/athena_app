@@ -17,6 +17,7 @@ android {
         }
     }
     buildToolsVersion = '26.0.2'
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
@@ -31,11 +32,9 @@ dependencies {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
-    androidTestCompile 'com.android.support:support-annotations:26.1.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
     implementation 'com.android.support:support-dynamic-animation:26.1.0'
-
-
+    androidTestCompile 'com.android.support:support-annotations:26.1.0'
 
 }

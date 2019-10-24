@@ -2,6 +2,8 @@ package com.athena.athena;
 
 import android.content.Context;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +18,17 @@ public class MainActivity extends AppCompatActivity {
     final String TAG = "main";
     private GestureDetector gestureDetector;
     public View vTouch;
+    calendarActivity calendar;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = getSharedPreferences("athenaPrefs", MODE_PRIVATE);
+        editor = prefs.edit();
         setContentView(R.layout.activity_main);
         View backview = findViewById(R.id.rect_backgr);
         View baseview = findViewById(R.id.rect_base);
@@ -41,35 +50,58 @@ public class MainActivity extends AppCompatActivity {
         n1.context = this;
         n1.base = this.findViewById(R.id.rect_base);
         n1.eventview = event;
+        n1.prefs = prefs;
+        n1.editor = editor;
         baseview.setBackgroundColor(getResources().getColor(R.color.green));
         n1.listen();
+
+
+
+
+
+
+
 
 
     }
 
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        float dX, dY;
-
+        float x1, x2, y1, y2;
+        int SWIPE_THRESHOLD = 300;
         public boolean onTouch(View v, MotionEvent event) {
             String name = v.getTag().toString();
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-            Log.d(TAG, "onTouch: " + event.toString());
+            
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     Log.i("TAG", "touched down");
-                    dX = v.getX() - event.getRawX();
-                    dY = v.getY() - event.getRawY();
+                    x1 = event.getX();
+                    y1 = event.getY();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    Log.i("TAG", String.format("moving in %s: v(%d, %d)", name, x, y));
-                    v.animate()
-                            .x(event.getRawX() + dX - (v.getWidth() / 100))
-                            .setDuration(1)
-                            .start();
+
+                    Log.i(TAG, "onTouch: dX" + String.valueOf(v.getX() - event.getRawX()));
+                    Log.i(TAG, "onTouch: dY" + String.valueOf(v.getY() - event.getRawY()));
+                    //Log.i("TAG", String.format("moving in %s: (%e, %e)", name, event.getRawX(), event.getRawY()));
+                    //v.animate()
+                      //      .x(event.getRawX() + dX - (v.getWidth() / 100))
+                      //      .setDuration(1)
+                      //      .start();
                     break;
                 case MotionEvent.ACTION_UP:
                     Log.i("TAG", "touched up");
+                    x2 = event.getX();
+                    y2 = event.getY();
+                    Log.d(TAG, "onTouch: " + String.valueOf(x1 - x2));
+                    if (name.equals("calendar")) {
+                        if (x1 > x2) {
+                            Log.d(TAG, "onTouch: got leftward swipe!");
+
+                            Intent intent = new Intent(getBaseContext(), calendarActivity.class);
+                            startActivity(intent);
+
+                        }
+                    }
+
                     break;
             }
 
