@@ -13,7 +13,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-
+//TODO: use the Picasso library to download and show images(see test2/mainActivity)
 public class MainActivity extends AppCompatActivity {
     final String TAG = "main";
     private GestureDetector gestureDetector;
