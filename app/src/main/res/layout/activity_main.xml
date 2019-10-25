@@ -6,10 +6,13 @@
     android:id="@+id/android_1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@drawable/rect_background">
+
 
 
     <!-- rect background -->
+
+
     <View
         android:id="@+id/rect_backgr"
         android:tag="background"
@@ -140,6 +143,7 @@
         android:layout_height="0dp"
         android:elevation="10dp"
         android:text="calendar"
+        android:textColor="@color/white"
         android:gravity="center"
         android:textSize="30sp"
         android:visibility="visible"
@@ -157,6 +161,7 @@
         android:layout_height="0dp"
         android:elevation="10dp"
         android:text="news"
+        android:textColor="@color/white"
         android:gravity="center"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/rect_news"
@@ -171,7 +176,7 @@
         android:layout_height="0dp"
         android:elevation="10dp"
         android:text="anime"
-
+        android:textColor="@color/white"
         android:gravity="center"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/rect_anime"

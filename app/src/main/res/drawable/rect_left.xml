@@ -7,7 +7,7 @@
 
     <!--If your shape requires only one solid color-->
     <solid
-        android:color="@color/white" />
+        android:color="@color/cardDark" />
 
 
 </shape>

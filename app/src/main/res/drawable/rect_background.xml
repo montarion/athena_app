@@ -4,7 +4,7 @@
 
     <!--If your shape requires only one solid color-->
     <solid
-        android:color="@color/colorPrimaryDark" />
+        android:color="@color/backgroundDark" />
 
 
 </shape>
