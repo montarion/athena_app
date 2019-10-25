@@ -166,10 +166,12 @@
 
     <TextView
         android:id="@+id/text_anime"
+        android:tag="text_anime"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:elevation="10dp"
         android:text="anime"
+
         android:gravity="center"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="@+id/rect_anime"

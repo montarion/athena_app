@@ -52,6 +52,7 @@ public class networking extends Activity{
     View base;
 
     TextView eventview;
+    TextView text_anime;
 
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
@@ -154,17 +155,22 @@ public class networking extends Activity{
                         }
                         if (key.equals("anime")){
                             try{
-                            final Map<String, Object> anime = parseJSON(new ObjectMapper().writeValueAsString(response.get("anime")));
-                            Log.d(TAG, "call: anime" + anime.toString());
-                                runOnUiThread(new Runnable() {
+                                final Map<String, Object> anime = parseJSON(new ObjectMapper().writeValueAsString(response.get("anime")));
+                                Log.d(TAG, "call THING: " + anime.toString());
 
-                                    @Override
-                                    public void run() {
-                                        TextView animetext = findViewById(R.id.text_anime);
-                                        animetext.setText(anime.get("title").toString());
-                                        Log.d(TAG, "run: DONE UPDATING!");
-                                    }
-                                });
+                                Log.d(TAG, "call: anime" + anime.toString());
+                                editor.putString("title", anime.get("title").toString());
+                                editor.putString("episode", anime.get("episode").toString());
+                                editor.commit();
+                                    runOnUiThread(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            TextView animetext = text_anime;
+                                            animetext.setText(anime.get("title").toString());
+                                            Log.d(TAG, "run: DONE UPDATING!");
+                                        }
+                                    });
                             } catch (Exception e) {
                                 Log.e(TAG, "anime error: " + e.getMessage() + e.getCause());
                             }
@@ -175,7 +181,7 @@ public class networking extends Activity{
             }
         });
     }
-    public static void send(String key, Object value) {
+    public void send(String key, Object value) {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(key, value);
@@ -188,7 +194,7 @@ public class networking extends Activity{
     public Map<String, Object> parseJSON(String command){
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-
+        Log.d(TAG, "parseJSON: string to parse: " + command);
         Map<String, Object> response = null;
         try {
             response = mapper.readValue(command, HashMap.class);

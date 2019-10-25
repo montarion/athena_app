@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     calendarActivity calendar;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+    networking n1;
 
 
 
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         View transitview = findViewById(R.id.rect_transi);
         View newsview = findViewById(R.id.rect_news);
         TextView event = findViewById(R.id.text_calend);
+        TextView text_anime = findViewById(R.id.text_anime);
         backview.setOnTouchListener(touchListener);
         baseview.setOnTouchListener(touchListener);
         weatherview.setOnTouchListener(touchListener);
@@ -47,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
         transitview.setOnTouchListener(touchListener);
         newsview.setOnTouchListener(touchListener);
 
-        networking n1 = new networking();
+        n1 = new networking();
         n1.context = this;
         n1.base = this.findViewById(R.id.rect_base);
         n1.eventview = event;
+        n1.text_anime = text_anime;
         n1.prefs = prefs;
         n1.editor = editor;
         baseview.setBackgroundColor(getResources().getColor(R.color.green));
@@ -65,7 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+    public void clickget(View v){
+        String name = v.getTag().toString();
+        if (name.equals("text_anime")) {
+            n1.send("anime", "");
+        }
+    }
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
         float x1, x2, y1, y2;
         int SWIPE_THRESHOLD = 300;
@@ -83,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
                     //Log.i(TAG, "onTouch: dX" + String.valueOf(v.getX() - event.getRawX()));
                     Log.i(TAG, "onTouch: dY" + String.valueOf(v.getY() - event.getRawY()));
                     Log.i(TAG, "onTouch: finger position: " + String.valueOf(v.getY()));
-                    ViewGroup.LayoutParams mainlp = v.getLayoutParams();
-                    mainlp.height += v.getY() - event.getRawY();
-                    v.setLayoutParams(mainlp);
+                    //ViewGroup.LayoutParams mainlp = v.getLayoutParams();
+                    //mainlp.height += v.getY() - event.getRawY();
+                    //v.setLayoutParams(mainlp);
 
 
                     //v.requestLayout();
@@ -101,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     y2 = event.getY();
                     Log.d(TAG, "onTouch: " + String.valueOf(x1 - x2));
                     if (name.equals("calendar")) {
-                        if (x1 > x2) {
+                        if (x1 + SWIPE_THRESHOLD > x2) {
                             Log.d(TAG, "onTouch: got leftward swipe!");
 
                             Intent intent = new Intent(getBaseContext(), calendarActivity.class);
@@ -109,10 +117,21 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     } if (name.equals("news")){
-                        if (y1 > y2){
+                        if (y1 + SWIPE_THRESHOLD > y2){
                             Log.d(TAG, "onTouch: upward swipe");
                         }
-                }
+                    } if (name.equals("anime")){
+                        if (x1 + SWIPE_THRESHOLD < x2) {
+                            Log.d(TAG, "onTouch: got rightward swipe!");
+                            Intent intent = new Intent(getBaseContext(), animeActivity.class);
+                            startActivity(intent);
+                        } else {
+                            n1.send("anime", "");
+                        }
+                    }
+                    else {
+                            Log.d(TAG, "onTouch: name is: " + name);
+                        }
 
                     break;
             }
