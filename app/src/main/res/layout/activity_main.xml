@@ -81,7 +81,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.397" />
+        app:layout_constraintVertical_bias="0.35000002" />
 
     <!-- rect anime -->
     <View
@@ -150,5 +150,31 @@
         app:layout_constraintTop_toTopOf="@+id/rect_calend"
         app:layout_constraintVertical_bias="0.0"
         tools:text="calendar" />
+
+    <TextView
+        android:id="@+id/text_news"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="10dp"
+        android:text="news"
+        android:gravity="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/rect_news"
+        app:layout_constraintEnd_toEndOf="@+id/rect_news"
+        app:layout_constraintStart_toStartOf="@+id/rect_news"
+        app:layout_constraintTop_toTopOf="@+id/rect_news" />
+
+    <TextView
+        android:id="@+id/text_anime"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="10dp"
+        android:text="anime"
+        android:gravity="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/rect_anime"
+        app:layout_constraintEnd_toEndOf="@+id/rect_anime"
+        app:layout_constraintStart_toStartOf="@+id/rect_anime"
+        app:layout_constraintTop_toTopOf="@+id/rect_anime" />
 </android.support.constraint.ConstraintLayout>
 

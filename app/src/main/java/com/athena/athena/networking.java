@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -52,7 +53,6 @@ public class networking extends Activity{
 
     TextView eventview;
 
-    calendarActivity calendar;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
 
@@ -61,6 +61,7 @@ public class networking extends Activity{
         super.onCreate(savedInstanceState, persistentState);
         setContentView(R.layout.activity_main);
         apcontext = getApplicationContext();
+
 
         Log.d(TAG, "onCreate: calling scheduler");
 
@@ -97,9 +98,11 @@ public class networking extends Activity{
             @Override
             public void call(Object... args) {
                 Log.d(TAG, "call: Got connected!");
+                status = "connected";
                 base.setBackgroundColor(ContextCompat.getColor(context, R.color._light_green));
                 String[] opts = {"agenda", "weather"};
                 send("motd", Arrays.toString(opts));
+
 
 
 
@@ -146,7 +149,24 @@ public class networking extends Activity{
                                 });
 
                             } catch (Exception e) {
-                                Log.e(TAG, "call error: " + e.getMessage() + e.getCause());
+                                Log.e(TAG, "motd error: " + e.getMessage() + e.getCause());
+                            }
+                        }
+                        if (key.equals("anime")){
+                            try{
+                            final Map<String, Object> anime = parseJSON(new ObjectMapper().writeValueAsString(response.get("anime")));
+                            Log.d(TAG, "call: anime" + anime.toString());
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        TextView animetext = findViewById(R.id.text_anime);
+                                        animetext.setText(anime.get("title").toString());
+                                        Log.d(TAG, "run: DONE UPDATING!");
+                                    }
+                                });
+                            } catch (Exception e) {
+                                Log.e(TAG, "anime error: " + e.getMessage() + e.getCause());
                             }
                         }
                     }

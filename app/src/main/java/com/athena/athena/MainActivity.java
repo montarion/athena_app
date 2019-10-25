@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 //TODO: use the Picasso library to download and show images(see test2/mainActivity)
 public class MainActivity extends AppCompatActivity {
@@ -79,8 +80,15 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MotionEvent.ACTION_MOVE:
 
-                    Log.i(TAG, "onTouch: dX" + String.valueOf(v.getX() - event.getRawX()));
+                    //Log.i(TAG, "onTouch: dX" + String.valueOf(v.getX() - event.getRawX()));
                     Log.i(TAG, "onTouch: dY" + String.valueOf(v.getY() - event.getRawY()));
+                    Log.i(TAG, "onTouch: finger position: " + String.valueOf(v.getY()));
+                    ViewGroup.LayoutParams mainlp = v.getLayoutParams();
+                    mainlp.height += v.getY() - event.getRawY();
+                    v.setLayoutParams(mainlp);
+
+
+                    //v.requestLayout();
                     //Log.i("TAG", String.format("moving in %s: (%e, %e)", name, event.getRawX(), event.getRawY()));
                     //v.animate()
                       //      .x(event.getRawX() + dX - (v.getWidth() / 100))
@@ -100,7 +108,11 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-                    }
+                    } if (name.equals("news")){
+                        if (y1 > y2){
+                            Log.d(TAG, "onTouch: upward swipe");
+                        }
+                }
 
                     break;
             }
