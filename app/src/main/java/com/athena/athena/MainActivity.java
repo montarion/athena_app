@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 //TODO: figure out how to cut long text short gracefully(with trailing elipse)
+//TODO: figure out how to get location
+
 
 public class MainActivity extends AppCompatActivity {
     final String TAG = "main";
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     y2 = event.getY();
                     Log.d(TAG, "onTouch: " + String.valueOf(x1 - x2));
                     if (name.equals("calendar")) {
-                        if (x1 + SWIPE_THRESHOLD > x2) {
+                        if (x1 - SWIPE_THRESHOLD > x2) {
                             Log.d(TAG, "onTouch: got leftward swipe!");
                             Intent intent = new Intent(getBaseContext(), calendarActivity.class);
                             startActivity(intent);
