@@ -129,27 +129,48 @@ public class networking extends Activity{
                         if (key.equals("motd")) {
                             try {
                                 Map<String, Object> motd = parseJSON(new ObjectMapper().writeValueAsString(response.get("motd")));
-                                Log.d(TAG, "call: motd" + motd.toString());
-                                Log.e(TAG, "call: THING: " + maptoJSON(response.get("motd")));
-                                editor.putString("calendar", maptoJSON(motd.get("calendar")));
-                                editor.putString("weather", maptoJSON(motd.get("weather")));
-                                editor.commit();
-                                final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
-                                final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
-                                Log.d(TAG, "call: calendar" + calendar.toString());
-                                Log.d(TAG, "call: calendar" + calendar.get("event"));
-                                Log.d(TAG, "call: weather " + weather.toString());
-                                final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
-
-                                runOnUiThread(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        eventview.setText(calendar.get("event").toString());
-                                        temperatureview.setText(String.valueOf(temperature) + "°");
-                                        Log.d(TAG, "run: DONE UPDATING!");
+                                Log.d(TAG, "call: motd keys: " + motd.keySet().toString());
+                                Iterator skeys = motd.entrySet().iterator();
+                                Log.d(TAG, "call: " + skeys.toString());
+                                while (skeys.hasNext()) {
+                                    Map.Entry sentry = (Map.Entry) skeys.next();
+                                    String skey = (String) sentry.getKey();
+                                    Log.d(TAG, "call: " + skey);
+                                    if (skey.equals("calendar")){
+                                        editor.putString("calendar", maptoJSON(motd.get("calendar")));
+                                        editor.commit();
+                                        final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
+                                        Log.d(TAG, "call: calendar" + calendar.toString());
+                                        Log.d(TAG, "call: calendar" + calendar.get("event"));
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                eventview.setText(calendar.get("event").toString());
+                                                Log.d(TAG, "run: DONE UPDATING CALENDAR!");
+                                            }
+                                        });
                                     }
-                                });
+                                    if (skey.equals("calendar")){
+                                        editor.putString("weather", maptoJSON(motd.get("weather")));
+                                        editor.commit();
+                                        final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
+                                        final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
+                                        runOnUiThread(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                temperatureview.setText(String.valueOf(temperature) + "°");
+                                                Log.d(TAG, "run: DONE UPDATING WEATHER!");
+                                            }
+                                        });
+                                    }
+                                }
+
+
+
+
+
+
 
                             } catch (Exception e) {
                                 Log.e(TAG, "motd error: " + e.getMessage() + e.getCause());
