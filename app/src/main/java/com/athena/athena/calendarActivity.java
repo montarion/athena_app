@@ -1,5 +1,4 @@
 package com.athena.athena;
-
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
@@ -25,7 +24,7 @@ public class calendarActivity extends AppCompatActivity {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
     ObjectMapper mapper = new ObjectMapper();
-    HashMap<String, Object> agenda;
+    HashMap<String, Object> calendar;
     TextView calview;
     TextView dateview;
     TextView addressview;
@@ -39,27 +38,27 @@ public class calendarActivity extends AppCompatActivity {
         calview = findViewById(R.id.calview);
         dateview = findViewById(R.id.date);
         addressview = findViewById(R.id.address);
-        String test = "{\"agenda\":{\"start\":\"2019-10-25 13:20:00+02:00\",\"event\":\"Keyboard\",\"end\":\"2019-10-25 13:40:00+02:00\",\"ongoing\":false,\"location\":\"Library Idea Zeist, Markt 1, 3701 JZ Zeist, Netherlands\"},\"weather\":\"it's warm\"}";
-        String agendastring = prefs.getString("agenda", test);
+        String test = "{\"calendar\":{\"start\":\"2019-10-25 13:20:00+02:00\",\"event\":\"Keyboard\",\"end\":\"2019-10-25 13:40:00+02:00\",\"ongoing\":false,\"location\":\"Library Idea Zeist, Markt 1, 3701 JZ Zeist, Netherlands\"},\"weather\":\"it's warm\"}";
+        String calendarstring = prefs.getString("calendar", test);
         try{
-            agenda = parseJSON(agendastring);
-            Log.d(TAG, "onCreate: " + agenda.toString());
+            calendar = parseJSON(calendarstring);
+            Log.d(TAG, "onCreate: " + calendar.toString());
         }catch (Exception e){
             Log.e(TAG, "onCreate: " + e.getMessage());
         }
-        Log.d(TAG, "onCreate: " + agenda.keySet().toString());
-        Log.d(TAG, "onCreate: " + agenda.get("event").toString());
-        String event = agenda.get("event").toString();
-        String date = parseTime(agenda.get("start").toString());
-        String address = agenda.get("location").toString();
+        Log.d(TAG, "onCreate: " + calendar.keySet().toString());
+        Log.d(TAG, "onCreate: " + calendar.get("event").toString());
+        String event = calendar.get("event").toString();
+        String date = parseTime(calendar.get("start").toString());
+        String address;
+        try {
+            address = calendar.get("location").toString();
+        } catch (Exception e){
+            address = "";
+        }
         calview.setText(event);
         dateview.setText(date);
         addressview.setText(address);
-    }
-
-    public void display(){
-        //calview.setText(agenda.get("event").toString());
-
     }
 
     public HashMap<String, Object> parseJSON(String command){
