@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".calendarActivity" />
-        <activity android:name=".animeActivity"></activity>
+        <activity android:name=".animeActivity" />
+        <activity android:name=".weatherActivity"></activity>
     </application>
 
 </manifest>

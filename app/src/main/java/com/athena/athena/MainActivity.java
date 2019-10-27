@@ -14,7 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-//TODO: use the Picasso library to download and show images(see test2/mainActivity)
+//TODO: figure out how to cut long text short gracefully(with trailing elipse)
+
 public class MainActivity extends AppCompatActivity {
     final String TAG = "main";
     private GestureDetector gestureDetector;
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         View aniview = findViewById(R.id.rect_anime);
         View transitview = findViewById(R.id.rect_transi);
         View newsview = findViewById(R.id.rect_news);
-        TextView event = findViewById(R.id.text_calend);
+        TextView text_weather = findViewById(R.id.text_weather);
+        TextView text_calendar = findViewById(R.id.text_calend);
         TextView text_anime = findViewById(R.id.text_anime);
         backview.setOnTouchListener(touchListener);
         baseview.setOnTouchListener(touchListener);
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         n1 = new networking();
         n1.context = this;
         n1.base = this.findViewById(R.id.rect_base);
-        n1.eventview = event;
+        n1.temperatureview = text_weather;
+        n1.eventview = text_calendar;
         n1.text_anime = text_anime;
         n1.prefs = prefs;
         n1.editor = editor;
@@ -111,10 +114,10 @@ public class MainActivity extends AppCompatActivity {
                     if (name.equals("calendar")) {
                         if (x1 + SWIPE_THRESHOLD > x2) {
                             Log.d(TAG, "onTouch: got leftward swipe!");
-
                             Intent intent = new Intent(getBaseContext(), calendarActivity.class);
                             startActivity(intent);
-
+                        } else {
+                            n1.send("calendar", "");
                         }
                     } if (name.equals("news")){
                         if (y1 + SWIPE_THRESHOLD > y2){
@@ -128,8 +131,15 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             n1.send("anime", "");
                         }
-                    }
-                    else {
+                    } if (name.equals("weather")){
+                        if (x1 + SWIPE_THRESHOLD/2 < x2){
+                            Log.d(TAG, "onTouch: got rightward swipe!");
+                            Intent intent = new Intent(getBaseContext(), weatherActivity.class);
+                            startActivity(intent);
+                        } else {
+                            n1.send("weather", "");
+                        }
+                    } else {
                             Log.d(TAG, "onTouch: name is: " + name);
                         }
 

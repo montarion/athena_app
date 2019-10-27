@@ -51,6 +51,7 @@ public class networking extends Activity{
 
     View base;
 
+    TextView temperatureview;
     TextView eventview;
     TextView text_anime;
 
@@ -101,7 +102,7 @@ public class networking extends Activity{
                 Log.d(TAG, "call: Got connected!");
                 status = "connected";
                 base.setBackgroundColor(ContextCompat.getColor(context, R.color._light_green));
-                String[] opts = {"agenda", "weather"};
+                String[] opts = {"calendar", "weather"};
                 send("motd", Arrays.toString(opts));
 
 
@@ -130,21 +131,22 @@ public class networking extends Activity{
                                 Map<String, Object> motd = parseJSON(new ObjectMapper().writeValueAsString(response.get("motd")));
                                 Log.d(TAG, "call: motd" + motd.toString());
                                 Log.e(TAG, "call: THING: " + maptoJSON(response.get("motd")));
-                                editor.putString("agenda", maptoJSON(motd.get("agenda")));
+                                editor.putString("calendar", maptoJSON(motd.get("calendar")));
+                                editor.putString("weather", maptoJSON(motd.get("weather")));
                                 editor.commit();
-                                final Map<String, Object> agenda = parseJSON(new ObjectMapper().writeValueAsString(motd.get("agenda")));
-                                String weather = motd.get("weather").toString();
-                                Log.d(TAG, "call: agenda" + agenda.toString());
-                                Log.d(TAG, "call: agenda" + agenda.get("event"));
-                                Log.d(TAG, "call: weather " + weather);
-                                //calendar.agenda = agenda;
-
+                                final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
+                                final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
+                                Log.d(TAG, "call: calendar" + calendar.toString());
+                                Log.d(TAG, "call: calendar" + calendar.get("event"));
+                                Log.d(TAG, "call: weather " + weather.toString());
+                                final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
 
                                 runOnUiThread(new Runnable() {
 
                                     @Override
                                     public void run() {
-                                        eventview.setText(agenda.get("event").toString());
+                                        eventview.setText(calendar.get("event").toString());
+                                        temperatureview.setText(String.valueOf(temperature) + "°");
                                         Log.d(TAG, "run: DONE UPDATING!");
                                     }
                                 });

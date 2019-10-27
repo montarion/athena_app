@@ -183,5 +183,21 @@
         app:layout_constraintEnd_toEndOf="@+id/rect_anime"
         app:layout_constraintStart_toStartOf="@+id/rect_anime"
         app:layout_constraintTop_toTopOf="@+id/rect_anime" />
+
+    <TextView
+        android:id="@+id/text_weather"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="10dp"
+        android:text="0°"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/rect_weathe"
+        app:layout_constraintEnd_toEndOf="@+id/rect_weathe"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rect_weathe" />
+
 </android.support.constraint.ConstraintLayout>
 
