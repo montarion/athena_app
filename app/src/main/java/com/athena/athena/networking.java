@@ -1,11 +1,15 @@
 package com.athena.athena;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,9 +42,13 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import static android.app.Notification.DEFAULT_VIBRATE;
+
 /**
  * Created by Jamiro on 21/10/2019.
  */
+
+//TODO: added notification framework. test if it still works with services, or if you need broadcastreceivers again.
 
 public class networking extends Activity{
     Context context;
@@ -57,6 +65,14 @@ public class networking extends Activity{
 
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+
+    //notifications
+    String notititle = "testtitle";
+    String notitext = "testtext";
+    String category = "standard";
+    NotificationManagerCompat notificationManager;
+    Object notiservice;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
@@ -192,6 +208,7 @@ public class networking extends Activity{
                                             TextView animetext = text_anime;
                                             animetext.setText(anime.get("title").toString());
                                             Log.d(TAG, "run: DONE UPDATING!");
+                                            notification(anime.get("title").toString(), "now watchable", "anime");
                                         }
                                     });
                             } catch (Exception e) {
@@ -240,6 +257,29 @@ public class networking extends Activity{
             Log.d(TAG, "parseJSON: " + e.getMessage());
         }
         return response;
+    }
+
+    public void notification(String notititle, String notitext, String category) {
+        Log.d(TAG, "notification: here!");
+        NotificationChannel channel = new NotificationChannel(category, category, NotificationManager.IMPORTANCE_HIGH);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManagercheck = (NotificationManager)notiservice;
+        notificationManagercheck.createNotificationChannel(channel);
+        notificationManager = NotificationManagerCompat.from(context);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, category)
+                //smallicon must be located in app/src/main/res/something(drawable)/nameofimage
+                .setSmallIcon(R.drawable.rect_bottom)
+                .setContentTitle(notititle)
+                .setContentText(notitext)
+                .setDefaults(DEFAULT_VIBRATE)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setChannelId(category);
+        Log.i("status", "firing notification");
+        int notid = 0;
+        notid =+ 1;
+
+        notificationManager.notify(notid, mBuilder.build());
     }
 
 }

@@ -1,11 +1,17 @@
 package com.athena.athena;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +20,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import static android.app.Notification.DEFAULT_VIBRATE;
 //TODO: figure out how to cut long text short gracefully(with trailing elipse)
 //TODO: figure out how to get location
 
@@ -26,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
     networking n1;
+    Context context = this;
 
 
 
@@ -61,9 +70,13 @@ public class MainActivity extends AppCompatActivity {
         n1.text_anime = text_anime;
         n1.prefs = prefs;
         n1.editor = editor;
+        n1.notiservice = getSystemService(NotificationManager.class);
         baseview.setBackgroundColor(getResources().getColor(R.color.green));
         n1.listen();
 
+        //ask for permissions
+        //String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO};
+        //ActivityCompat.requestPermissions(this, permissions, 1);
 
 
 
@@ -122,8 +135,10 @@ public class MainActivity extends AppCompatActivity {
                             n1.send("calendar", "");
                         }
                     } if (name.equals("news")){
-                        if (y1 + SWIPE_THRESHOLD > y2){
+                        if (y1 - SWIPE_THRESHOLD > y2){
                             Log.d(TAG, "onTouch: upward swipe");
+                        } else{
+                            n1.notification("test", "test text", "whatevs");
                         }
                     } if (name.equals("anime")){
                         if (x1 + SWIPE_THRESHOLD < x2) {
@@ -151,5 +166,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
+
+
 
 }
