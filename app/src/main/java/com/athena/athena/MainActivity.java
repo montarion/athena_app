@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     calendarActivity calendar;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+    Handler handler;
     networking n1;
     Context context = this;
 
@@ -63,21 +64,37 @@ public class MainActivity extends AppCompatActivity {
         newsview.setOnTouchListener(touchListener);
 
         n1 = new networking();
-        n1.context = this;
-        n1.base = this.findViewById(R.id.rect_base);
-        n1.temperatureview = text_weather;
-        n1.eventview = text_calendar;
-        n1.text_anime = text_anime;
-        n1.prefs = prefs;
         n1.editor = editor;
-        n1.notiservice = getSystemService(NotificationManager.class);
+        n1.prefs = prefs;
+        n1.context = context;
+
+        handler = new Handler();
+        handler.context = this;
+        handler.base = this.findViewById(R.id.rect_base);
+        handler.temperatureview = text_weather;
+        handler.eventview = text_calendar;
+        handler.text_anime = text_anime;
+        handler.prefs = prefs;
+        handler.editor = editor;
+        handler.notiservice = getSystemService(NotificationManager.class);
         baseview.setBackgroundColor(getResources().getColor(R.color.green));
+        n1.handler = handler;
+        Intent intent = new Intent(this, networking.class);
+
+        Log.d(TAG, "onCreate: trying to start networking");
+        startService(intent);
+        Log.d(TAG, "onCreate: started networking");
         n1.listen();
 
         //ask for permissions
         //String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO};
         //ActivityCompat.requestPermissions(this, permissions, 1);
 
+        NotificationChannel channel = new NotificationChannel("foreground service", "foreground service", NotificationManager.IMPORTANCE_MIN);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManagercheck = getSystemService(NotificationManager.class);
+        notificationManagercheck.createNotificationChannel(channel);
 
 
 
@@ -138,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                         if (y1 - SWIPE_THRESHOLD > y2){
                             Log.d(TAG, "onTouch: upward swipe");
                         } else{
-                            n1.notification("test", "test text", "whatevs");
+                            handler.notification("test", "test text", "whatevs");
                         }
                     } if (name.equals("anime")){
                         if (x1 + SWIPE_THRESHOLD < x2) {
