@@ -8,6 +8,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.SystemClock;
@@ -45,6 +48,9 @@ public class Handler extends Activity{
 
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+
+    //gps stuff
+    LocationManager locationManager;
 
     //notifications
     String notititle = "testtitle";
@@ -136,6 +142,22 @@ public class Handler extends Activity{
                     Log.e(TAG, "anime error: " + e.getMessage() + e.getCause());
                 }
             }
+            if (key.equals("location")) {
+                try {
+                    final Map<String, Object> location = parseJSON(new ObjectMapper().writeValueAsString(response.get(key)));
+                    Log.d(TAG, "onMessage: " + location);
+                    if (location.get("command").equals("request")) {
+                        Log.i(TAG, "onMessage: Got location request!");
+                        String coords = getLocation();
+                        networking.send("gpscoords", coords);
+                    }
+                }catch (Exception e){
+                    ;
+                }
+
+
+
+            }
             if (key.equals("notification")) {
                 try{
                     final Map<String, Object> notification = parseJSON(new ObjectMapper().writeValueAsString(response.get(key)));
@@ -206,6 +228,33 @@ public class Handler extends Activity{
         notid =+ 1;
 
         notificationManager.notify(notid, mBuilder.build());
+    }
+
+    public String getLocation() {
+
+        Log.d(TAG, "getLocation: inside!");
+        Criteria criteria = new Criteria();
+        String provider;
+        String coordinates = null;
+        locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(criteria, true);
+        Log.d(TAG, "getLocation: providers are: " + provider);
+        if (provider != null) {
+            try {
+                Location location = locationManager.getLastKnownLocation(provider);
+                final Map<String, String> gpscoords = new HashMap<String, String>();
+                gpscoords.put("lat", String.valueOf(location.getLatitude()));
+                gpscoords.put("lon", String.valueOf(location.getLongitude()));
+                coordinates = maptoJSON(gpscoords);
+                Log.d(TAG, "getLocation: " + coordinates);
+
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(TAG, "getLocation: provider must be null");
+        }
+        return coordinates;
     }
 }
 

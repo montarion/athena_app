@@ -160,7 +160,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:elevation="10dp"
-        android:text="news"
+        android:text="WIP"
         android:textColor="@color/white"
         android:gravity="center"
         android:textSize="30sp"
@@ -198,6 +198,20 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/rect_weathe" />
+
+    <TextView
+        android:id="@+id/text_transit"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="10dp"
+        android:text="WIP"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/rect_transi"
+        app:layout_constraintEnd_toEndOf="@+id/rect_transi"
+        app:layout_constraintStart_toStartOf="@+id/rect_transi"
+        app:layout_constraintTop_toTopOf="@+id/rect_transi" />
 
 </android.support.constraint.ConstraintLayout>
 

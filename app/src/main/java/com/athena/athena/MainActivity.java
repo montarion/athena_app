@@ -87,12 +87,11 @@ public class MainActivity extends AppCompatActivity {
         n1.listen();
 
         //ask for permissions
-        //String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO};
-        //ActivityCompat.requestPermissions(this, permissions, 1);
+        String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        ActivityCompat.requestPermissions(this, permissions, 1);
 
         NotificationChannel channel = new NotificationChannel("foreground service", "foreground service", NotificationManager.IMPORTANCE_MIN);
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
+
         NotificationManager notificationManagercheck = getSystemService(NotificationManager.class);
         notificationManagercheck.createNotificationChannel(channel);
 

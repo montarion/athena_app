@@ -154,7 +154,7 @@ public class networking extends Service{
             }
         });
     }
-    public void send(String key, Object value) {
+    public static void send(String key, Object value) {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(key, value);
