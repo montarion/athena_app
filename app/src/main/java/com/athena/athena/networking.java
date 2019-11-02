@@ -108,7 +108,7 @@ public class networking extends Service{
             IO.Options opts = new IO.Options();
             opts.forceNew = true;
             opts.reconnection = true;
-            socket = IO.socket("http://83.163.109.161:7777");
+            socket = IO.socket("http://0.0.0.0:1234");
 
 
             socket.connect();
