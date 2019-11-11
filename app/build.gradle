@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
     implementation 'com.android.support:support-dynamic-animation:26.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    compile 'com.android.support:percent:26.1.0'
     androidTestCompile 'com.android.support:support-annotations:26.1.0'
 
 }

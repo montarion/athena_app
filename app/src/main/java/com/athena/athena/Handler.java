@@ -94,7 +94,7 @@ public class Handler extends Activity{
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    eventview.setText(calendar.get("event").toString());
+                                    //eventview.setText(calendar.get("event").toString());
                                     Log.d(TAG, "run: DONE UPDATING CALENDAR!");
                                 }
                             });
@@ -108,7 +108,7 @@ public class Handler extends Activity{
 
                                 @Override
                                 public void run() {
-                                    temperatureview.setText(String.valueOf(temperature) + "°");
+                                    //temperatureview.setText(String.valueOf(temperature) + "°");
                                     Log.d(TAG, "run: DONE UPDATING WEATHER!");
                                 }
                             });
@@ -132,10 +132,10 @@ public class Handler extends Activity{
                         @Override
                         public void run() {
                             TextView animetext = text_anime;
-                            animetext.setText(anime.get("title").toString());
+                            //animetext.setText(anime.get("title").toString());
                             Log.d(TAG, "run: DONE UPDATING!");
                             SystemClock.sleep(1000);
-                            notification(anime.get("title").toString(), "now watchable", "anime");
+                            //notification(anime.get("title").toString(), "now watchable", "anime");
                         }
                     });
                 } catch (Exception e) {

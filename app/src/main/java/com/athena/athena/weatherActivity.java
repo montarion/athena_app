@@ -36,8 +36,7 @@ public class weatherActivity extends AppCompatActivity {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        iconview = findViewById(R.id.image_icon);
-        weatherview = findViewById(R.id.text_weather);
+
         String weatherstring = prefs.getString("weather", "null");
         try{
             weather = parseJSON(weatherstring);

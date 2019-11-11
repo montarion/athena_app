@@ -1,5 +1,5 @@
 package com.athena.athena;
-
+// tutorial! https://youtu.be/0FJUwpnjScQ
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,6 +19,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import static android.app.Notification.DEFAULT_VIBRATE;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     Context context = this;
 
 
+    ExpandableListView expandableListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +49,9 @@ public class MainActivity extends AppCompatActivity {
         prefs = getSharedPreferences("athenaPrefs", MODE_PRIVATE);
         editor = prefs.edit();
         setContentView(R.layout.activity_main);
-        View backview = findViewById(R.id.rect_backgr);
-        View baseview = findViewById(R.id.rect_base);
-        View weatherview = findViewById(R.id.rect_weathe);
-        View calview = (View) findViewById(R.id.rect_calend);
-        View aniview = findViewById(R.id.rect_anime);
-        View transitview = findViewById(R.id.rect_transi);
-        View newsview = findViewById(R.id.rect_news);
-        TextView text_weather = findViewById(R.id.text_weather);
-        TextView text_calendar = findViewById(R.id.text_calend);
-        TextView text_anime = findViewById(R.id.text_anime);
-        backview.setOnTouchListener(touchListener);
-        baseview.setOnTouchListener(touchListener);
-        weatherview.setOnTouchListener(touchListener);
-        calview.setOnTouchListener(touchListener);
-        aniview.setOnTouchListener(touchListener);
-        transitview.setOnTouchListener(touchListener);
-        newsview.setOnTouchListener(touchListener);
+
+        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
+        expandableListView.setAdapter((ExpendableListViewAdapter)new ExpendableListViewAdapter(this));
 
         n1 = new networking();
         n1.editor = editor;
@@ -70,14 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         handler = new Handler();
         handler.context = this;
-        handler.base = this.findViewById(R.id.rect_base);
-        handler.temperatureview = text_weather;
-        handler.eventview = text_calendar;
-        handler.text_anime = text_anime;
+
         handler.prefs = prefs;
         handler.editor = editor;
         handler.notiservice = getSystemService(NotificationManager.class);
-        baseview.setBackgroundColor(getResources().getColor(R.color.green));
         n1.handler = handler;
         Intent intent = new Intent(this, networking.class);
 

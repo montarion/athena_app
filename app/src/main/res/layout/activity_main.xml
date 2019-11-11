@@ -1,217 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/android_1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rect_background">
+    tools:context="com.athena.athena.weatherActivity"
+    >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-
-    <!-- rect background -->
-
-
-    <View
-        android:id="@+id/rect_backgr"
-        android:tag="background"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/rect_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <!-- rect base -->
-    <View
-        android:id="@+id/rect_base"
-        android:layout_width="fill_parent"
-        android:layout_height="448dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/rect_base"
-        android:tag="base"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <!-- rect weather -->
-    <View
-        android:id="@+id/rect_weathe"
-        android:tag="weather"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/rect_right"
-        android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.35" />
-
-    <!-- rect calendar -->
-    <View
-        android:id="@+id/rect_calend"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="470dp"
-        android:layout_marginTop="253dp"
-        android:background="@drawable/rect_left"
-        android:elevation="4dp"
-        android:tag="calendar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.35000002" />
-
-    <!-- rect anime -->
-    <View
-        android:id="@+id/rect_anime"
-        android:tag="anime"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/rect_right"
-        android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.70" />
-
-    <!-- rect transit -->
-    <View
-        android:id="@+id/rect_transi"
-        android:tag="transit"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/rect_left"
-        android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rect_backgr"
-        app:layout_constraintVertical_bias="0.70" />
-
-    <!-- rect news -->
-    <View
-        android:id="@+id/rect_news"
-        android:tag="news"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/rect_bottom"
-        android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_backgr"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-
-    <TextView
-        android:id="@+id/text_calend"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="10dp"
-        android:text="calendar"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_calend"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/rect_calend"
-        app:layout_constraintTop_toTopOf="@+id/rect_calend"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="calendar" />
-
-    <TextView
-        android:id="@+id/text_news"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="10dp"
-        android:text="WIP"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_news"
-        app:layout_constraintEnd_toEndOf="@+id/rect_news"
-        app:layout_constraintStart_toStartOf="@+id/rect_news"
-        app:layout_constraintTop_toTopOf="@+id/rect_news" />
-
-    <TextView
-        android:id="@+id/text_anime"
-        android:tag="text_anime"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="10dp"
-        android:text="anime"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_anime"
-        app:layout_constraintEnd_toEndOf="@+id/rect_anime"
-        app:layout_constraintStart_toStartOf="@+id/rect_anime"
-        app:layout_constraintTop_toTopOf="@+id/rect_anime" />
-
-    <TextView
-        android:id="@+id/text_weather"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="10dp"
-        android:text="0°"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_weathe"
-        app:layout_constraintEnd_toEndOf="@+id/rect_weathe"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rect_weathe" />
-
-    <TextView
-        android:id="@+id/text_transit"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="10dp"
-        android:text="WIP"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/rect_transi"
-        app:layout_constraintEnd_toEndOf="@+id/rect_transi"
-        app:layout_constraintStart_toStartOf="@+id/rect_transi"
-        app:layout_constraintTop_toTopOf="@+id/rect_transi" />
+        <ExpandableListView
+            android:id="@+id/expandableListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.5dp"
+            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
-
