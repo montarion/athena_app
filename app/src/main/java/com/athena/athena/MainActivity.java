@@ -1,5 +1,5 @@
 package com.athena.athena;
-// tutorial! https://youtu.be/0FJUwpnjScQ
+// for dragging things nicely: https://medium.com/over-engineering/hands-on-with-material-components-for-android-cards-311b00a5ea3
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,6 +7,7 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.FlingAnimation;
 import android.support.v4.app.ActivityCompat;
@@ -19,6 +20,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -51,7 +53,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
-        expandableListView.setAdapter((ExpendableListViewAdapter)new ExpendableListViewAdapter(this));
+        expandableListView.invalidateViews();
+        Log.d(TAG, "onCreate: " + String.valueOf(expandableListView));
+        final ExpendableListViewAdapter expListAdapter = new ExpendableListViewAdapter(this.context);
+        //expListAdapter.childNames = new String[][]{{null, null},{"hey", "you"}};
+        expandableListView.setAdapter(expListAdapter);
 
         n1 = new networking();
         n1.editor = editor;
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         handler.prefs = prefs;
         handler.editor = editor;
         handler.notiservice = getSystemService(NotificationManager.class);
+        handler.expListAdapter = expListAdapter;
         n1.handler = handler;
         Intent intent = new Intent(this, networking.class);
 
@@ -81,93 +88,56 @@ public class MainActivity extends AppCompatActivity {
         NotificationManager notificationManagercheck = getSystemService(NotificationManager.class);
         notificationManagercheck.createNotificationChannel(channel);
 
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            int previousItem = -1;
 
-
-
-
-
-
-    }
-    public void clickget(View v){
-        String name = v.getTag().toString();
-        if (name.equals("text_anime")) {
-            n1.send("anime", "");
-        }
-    }
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        float x1, x2, y1, y2;
-        int SWIPE_THRESHOLD = 300;
-        public boolean onTouch(View v, MotionEvent event) {
-            String name = v.getTag().toString();
-            
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    Log.i("TAG", "touched down");
-                    x1 = event.getX();
-                    y1 = event.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-
-                    //Log.i(TAG, "onTouch: dX" + String.valueOf(v.getX() - event.getRawX()));
-                    Log.i(TAG, "onTouch: dY" + String.valueOf(v.getY() - event.getRawY()));
-                    Log.i(TAG, "onTouch: finger position: " + String.valueOf(v.getY()));
-                    //ViewGroup.LayoutParams mainlp = v.getLayoutParams();
-                    //mainlp.height += v.getY() - event.getRawY();
-                    //v.setLayoutParams(mainlp);
-
-
-                    //v.requestLayout();
-                    //Log.i("TAG", String.format("moving in %s: (%e, %e)", name, event.getRawX(), event.getRawY()));
-                    //v.animate()
-                      //      .x(event.getRawX() + dX - (v.getWidth() / 100))
-                      //      .setDuration(1)
-                      //      .start();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    Log.i("TAG", "touched up");
-                    x2 = event.getX();
-                    y2 = event.getY();
-                    Log.d(TAG, "onTouch: " + String.valueOf(x1 - x2));
-                    if (name.equals("calendar")) {
-                        if (x1 - SWIPE_THRESHOLD > x2) {
-                            Log.d(TAG, "onTouch: got leftward swipe!");
-                            Intent intent = new Intent(getBaseContext(), calendarActivity.class);
-                            startActivity(intent);
-                        } else {
-                            n1.send("calendar", "");
-                        }
-                    } if (name.equals("news")){
-                        if (y1 - SWIPE_THRESHOLD > y2){
-                            Log.d(TAG, "onTouch: upward swipe");
-                        } else{
-                            handler.notification("test", "test text", "whatevs");
-                        }
-                    } if (name.equals("anime")){
-                        if (x1 + SWIPE_THRESHOLD < x2) {
-                            Log.d(TAG, "onTouch: got rightward swipe!");
-                            Intent intent = new Intent(getBaseContext(), animeActivity.class);
-                            startActivity(intent);
-                        } else {
-                            n1.send("anime", "");
-                        }
-                    } if (name.equals("weather")){
-                        if (x1 + SWIPE_THRESHOLD/2 < x2){
-                            Log.d(TAG, "onTouch: got rightward swipe!");
-                            Intent intent = new Intent(getBaseContext(), weatherActivity.class);
-                            startActivity(intent);
-                        } else {
-                            n1.send("weather", "");
-                        }
-                    } else {
-                            Log.d(TAG, "onTouch: name is: " + name);
-                        }
-
-                    break;
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if(groupPosition != previousItem )
+                    expandableListView.collapseGroup(previousItem);
+                previousItem = groupPosition;
             }
+        });
 
-            return true;
-        }
-    };
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                String name = expListAdapter.groupNames[groupPosition];
+                Log.d(TAG, "onGroupClick: got touch from: " + name);
+                if (name.equals("Anime")){
+                    networking.send("anime", "");
+                }
+                if(expandableListView.isGroupExpanded(groupPosition)){
+                    expandableListView.collapseGroup(groupPosition);
+                } else {
+                    expandableListView.expandGroup(groupPosition, true);
+                }
+                return true;
+            };
+
+
+        });
+        expListAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                Log.d(TAG, "onChanged: CHANGE");
+                super.onChanged();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        expandableListView.invalidateViews();
+                    }
+                });
+
+            }
+        });
+
+
+    }
+
+
+
 
 
 

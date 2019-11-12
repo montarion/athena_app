@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -25,12 +27,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import static android.app.Notification.DEFAULT_VIBRATE;
+import static org.xmlpull.v1.XmlPullParser.TYPES;
 
 /**
  * Created by Jamiro on 30/10/2019.
@@ -59,6 +64,9 @@ public class Handler extends Activity{
     NotificationManagerCompat notificationManager;
     Object notiservice;
     int notid = 0;
+
+    //building UI
+    ExpendableListViewAdapter expListAdapter;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
@@ -91,31 +99,37 @@ public class Handler extends Activity{
                             final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
                             Log.d(TAG, "call: calendar" + calendar.toString());
                             Log.d(TAG, "call: calendar" + calendar.get("event"));
+                            Log.d(TAG, "onMessage: " + Arrays.toString(expListAdapter.childNames[0]));
+                            int index = Arrays.asList(expListAdapter.groupNames).indexOf("Calendar");
+                            expListAdapter.groupNames[index] = calendar.get("event").toString();
+                            expListAdapter.childNames[index][0] = parseTime(calendar.get("start").toString());
+                            expListAdapter.childNames[index][1] = calendar.get("location").toString();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    //eventview.setText(calendar.get("event").toString());
-                                    Log.d(TAG, "run: DONE UPDATING CALENDAR!");
+                                    expListAdapter.notifyDataSetChanged();
                                 }
                             });
                         }
-                        if (skey.equals("calendar")){
+                        if (skey.equals("weather")){
                             editor.putString("weather", maptoJSON(motd.get("weather")));
                             editor.commit();
                             final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
+                            int index = Arrays.asList(expListAdapter.groupNames).indexOf("Weather");
+                            expListAdapter.groupNames[index] = weather.get("temperature")+" degrees".toString();
+                            expListAdapter.childNames[index][0] = weather.get("windspeed").toString();
                             final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
                             runOnUiThread(new Runnable() {
-
                                 @Override
                                 public void run() {
-                                    //temperatureview.setText(String.valueOf(temperature) + "°");
-                                    Log.d(TAG, "run: DONE UPDATING WEATHER!");
+                                    expListAdapter.notifyDataSetChanged();
                                 }
                             });
                         }
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "motd error: " + e.getMessage() + e.getCause());
+                    Log.e(TAG, "motd error: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             if (key.equals("anime")){
@@ -127,15 +141,13 @@ public class Handler extends Activity{
                     editor.putString("title", anime.get("title").toString());
                     editor.putString("episode", anime.get("episode").toString());
                     editor.commit();
+                    int index = Arrays.asList(expListAdapter.groupNames).indexOf("Anime");
+                    expListAdapter.groupNames[index] = anime.get("title").toString();
+                    expListAdapter.childNames[index][0] = anime.get("episode").toString();
                     runOnUiThread(new Runnable() {
-
                         @Override
                         public void run() {
-                            TextView animetext = text_anime;
-                            //animetext.setText(anime.get("title").toString());
-                            Log.d(TAG, "run: DONE UPDATING!");
-                            SystemClock.sleep(1000);
-                            //notification(anime.get("title").toString(), "now watchable", "anime");
+                            expListAdapter.notifyDataSetChanged();
                         }
                     });
                 } catch (Exception e) {
@@ -256,5 +268,23 @@ public class Handler extends Activity{
         }
         return coordinates;
     }
+
+    public String parseTime(String time){
+        Log.i(TAG, "parseTime: time: " + time);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("CET"));
+        Date convertedDate;
+        String finalDateString = "";
+        try {
+            convertedDate = dateFormat.parse(time);
+            SimpleDateFormat sdfnewformat = new SimpleDateFormat("EEE dd MMMM, HH:mm");
+            finalDateString = sdfnewformat.format(convertedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return finalDateString;
+    }
+
+
 }
 
