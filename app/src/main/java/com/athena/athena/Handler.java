@@ -19,12 +19,22 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.widget.CardView;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,11 +55,15 @@ public class Handler extends Activity{
     String TAG = "Handler";
     Context context;
 
-    View base;
+    boolean animerefresh;
+    boolean weatherrefresh;
+    boolean calendarrefresh;
 
     TextView temperatureview;
     TextView eventview;
     TextView text_anime;
+    TextView text_weather;
+    TextView text_calendar;
 
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
@@ -66,9 +80,31 @@ public class Handler extends Activity{
     int notid = 0;
 
     //building UI
-    ExpendableListViewAdapter expListAdapter;
+    CardView card_anime;
+    CardView card_weather;
+    CardView card_calendar;
+    LinearLayout mainlayout;
+    LinearLayout layout_anime;
+    LinearLayout layout_weather;
+    LinearLayout layout_calendar;
+
+    FrameLayout.LayoutParams hideparams;
+    FrameLayout.LayoutParams showparams;
+
+
+    DisplayMetrics displayMetrics;
+
+    int height;
+    int width;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        final WindowManager w = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        final Display d = w.getDefaultDisplay();
+        displayMetrics = new DisplayMetrics();
+        d.getMetrics(displayMetrics);
+        height = displayMetrics.heightPixels;
+        width  = displayMetrics.widthPixels;
         super.onCreate(savedInstanceState, persistentState);
 
     }
@@ -99,15 +135,19 @@ public class Handler extends Activity{
                             final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
                             Log.d(TAG, "call: calendar" + calendar.toString());
                             Log.d(TAG, "call: calendar" + calendar.get("event"));
-                            Log.d(TAG, "onMessage: " + Arrays.toString(expListAdapter.childNames[0]));
-                            int index = Arrays.asList(expListAdapter.groupNames).indexOf("Calendar");
-                            expListAdapter.groupNames[index] = calendar.get("event").toString();
-                            expListAdapter.childNames[index][0] = parseTime(calendar.get("start").toString());
-                            expListAdapter.childNames[index][1] = calendar.get("location").toString();
+                            final TextView textView = buildsubtext("Address is: " + calendar.get("location").toString());
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    expListAdapter.notifyDataSetChanged();
+                                    TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                                    if (calendarrefresh) {
+                                        layout_calendar.removeView(textView);
+                                        calendarrefresh = false;
+                                    }
+                                    text_calendar.setLayoutParams(showparams);
+                                    layout_calendar.addView(textView);
+                                    text_calendar.setText(calendar.get("event").toString());
+                                    calendarrefresh = true;
                                 }
                             });
                         }
@@ -115,14 +155,24 @@ public class Handler extends Activity{
                             editor.putString("weather", maptoJSON(motd.get("weather")));
                             editor.commit();
                             final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
-                            int index = Arrays.asList(expListAdapter.groupNames).indexOf("Weather");
-                            expListAdapter.groupNames[index] = weather.get("temperature")+" degrees".toString();
-                            expListAdapter.childNames[index][0] = weather.get("windspeed").toString();
                             final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
+                            final TextView textView = buildsubtext("Windspeed is: " + weather.get("windspeed").toString() + "km/h");
+                            final ImageView imageView = new ImageView(context);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    expListAdapter.notifyDataSetChanged();
+                                    TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                                    if (weatherrefresh) {
+                                        layout_weather.removeView(imageView);
+                                        layout_weather.removeView(textView);
+                                        weatherrefresh = false;
+                                    }
+                                    text_weather.setLayoutParams(showparams);
+                                    Picasso.get().load(weather.get("iconurl").toString()).resize(500, 500).into(imageView);
+                                    layout_weather.addView(imageView);
+                                    layout_weather.addView(textView);
+                                    text_weather.setText(temperature +" degrees");
+                                    weatherrefresh = true;
                                 }
                             });
                         }
@@ -141,13 +191,24 @@ public class Handler extends Activity{
                     editor.putString("title", anime.get("title").toString());
                     editor.putString("episode", anime.get("episode").toString());
                     editor.commit();
-                    int index = Arrays.asList(expListAdapter.groupNames).indexOf("Anime");
-                    expListAdapter.groupNames[index] = anime.get("title").toString();
-                    expListAdapter.childNames[index][0] = anime.get("episode").toString();
+                    final TextView textView = buildsubtext("It's episode: " + anime.get("episode").toString());
+                    final ImageView imageView = new ImageView(context);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            expListAdapter.notifyDataSetChanged();
+                            TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                            if (animerefresh){
+                                layout_anime.removeAllViewsInLayout();
+                                Log.d(TAG, "run: ANIME: removed views" );
+                                animerefresh = false;
+                            }
+                            Log.d(TAG, "run: width: " + width);
+                            Picasso.get().load(anime.get("imagelink").toString()).into(imageView);
+                            text_anime.setLayoutParams(showparams);
+                            layout_anime.addView(imageView);
+                            layout_anime.addView(textView);
+                            text_anime.setText(anime.get("title").toString());
+                            animerefresh = true;
                         }
                     });
                 } catch (Exception e) {
@@ -283,6 +344,15 @@ public class Handler extends Activity{
             e.printStackTrace();
         }
         return finalDateString;
+    }
+
+    public TextView buildsubtext(String text){
+        final TextView textView = new TextView(context);
+        textView.setText(text);
+        textView.setTextSize(20);
+        textView.setGravity(17);
+        textView.setFocusable(false);
+        return textView;
     }
 
 

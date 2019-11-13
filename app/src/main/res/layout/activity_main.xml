@@ -5,28 +5,163 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundDark">
 
-    <LinearLayout
-        android:layout_width="309dp"
+    <ScrollView
+        android:layout_width="0dp"
         android:layout_height="472dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
+        android:scrollbarStyle="insideOverlay"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ExpandableListView
-            android:id="@+id/expandableListView"
+        <LinearLayout
+            android:id="@+id/mainlayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:animateLayoutChanges="true"
-            android:clickable="true"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="0.5dp"
-            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
-    </LinearLayout>
+
+            android:clickable="false"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:tag="mainlayout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_anime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:minHeight="70dp"
+                android:tag="anime"
+                android:visibility="visible"
+                app:cardBackgroundColor="@color/cardDark"
+                app:cardElevation="4dp">
+
+                <TextView
+                    android:id="@+id/anime_head"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="anime"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                    android:textSize="30sp" />
+
+                <LinearLayout
+                    android:id="@+id/anime_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+
+                    <TextView
+                        android:id="@+id/anime_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                        android:textSize="30sp"
+                        android:visibility="invisible" />
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_weather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:minHeight="70dp"
+                android:tag="weather"
+                android:visibility="visible"
+                app:cardBackgroundColor="@color/cardDark"
+                app:cardElevation="4dp">
+
+                <TextView
+                    android:id="@+id/weather_head"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="weather"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                    android:textSize="30sp" />
+
+                <LinearLayout
+                    android:id="@+id/weather_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/weather_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                        android:textSize="30sp"
+                        android:visibility="invisible" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_calendar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:clickable="true"
+                android:minHeight="70dp"
+                android:tag="calendar"
+                android:visibility="visible"
+                app:cardBackgroundColor="@color/cardDark"
+                app:cardElevation="4dp">
+
+                <TextView
+                    android:id="@+id/calendar_head"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="calendar"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                    android:textSize="30sp" />
+
+                <LinearLayout
+                    android:id="@+id/calendar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/calendar_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Compat.Notification.Media"
+                        android:textSize="30sp"
+                        android:visibility="invisible" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
