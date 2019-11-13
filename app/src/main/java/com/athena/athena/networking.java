@@ -108,9 +108,7 @@ public class networking extends Service{
             IO.Options opts = new IO.Options();
             opts.forceNew = true;
             opts.reconnection = true;
-            socket = IO.socket("http://1.1.1.1:11111");
-
-
+            socket = IO.socket("http://1.1.1.1:1234");
             socket.connect();
             Log.d(TAG, "connect: " + socket.connected());
         } catch (URISyntaxException e ){
@@ -136,9 +134,7 @@ public class networking extends Service{
                 status = "connected";
                 String[] opts = {"calendar", "weather"};
                 send("motd", Arrays.toString(opts));
-
-
-
+                send("anime", "");
 
             }
         }).on("message", new Emitter.Listener() {
