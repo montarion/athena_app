@@ -90,7 +90,10 @@ public class Handler extends Activity{
 
     FrameLayout.LayoutParams hideparams;
     FrameLayout.LayoutParams showparams;
-
+    FrameLayout.LayoutParams invisparams;
+    TextView anime_empty;
+    TextView weather_empty;
+    TextView calendar_empty;
 
     DisplayMetrics displayMetrics;
 
@@ -105,6 +108,9 @@ public class Handler extends Activity{
         d.getMetrics(displayMetrics);
         height = displayMetrics.heightPixels;
         width  = displayMetrics.widthPixels;
+
+        //invisview.setLayoutParams(invisparams);
+
         super.onCreate(savedInstanceState, persistentState);
 
     }
@@ -141,10 +147,12 @@ public class Handler extends Activity{
                                 public void run() {
                                     TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                                     if (calendarrefresh) {
-                                        layout_calendar.removeView(textView);
+                                        layout_calendar.removeAllViews();
                                         calendarrefresh = false;
                                     }
                                     text_calendar.setLayoutParams(showparams);
+                                    layout_calendar.removeAllViews();
+                                    layout_calendar.addView(calendar_empty);
                                     layout_calendar.addView(textView);
                                     text_calendar.setText(calendar.get("event").toString());
                                     calendarrefresh = true;
@@ -163,12 +171,13 @@ public class Handler extends Activity{
                                 public void run() {
                                     TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                                     if (weatherrefresh) {
-                                        layout_weather.removeView(imageView);
-                                        layout_weather.removeView(textView);
+                                        layout_weather.removeAllViews();
                                         weatherrefresh = false;
                                     }
                                     text_weather.setLayoutParams(showparams);
                                     Picasso.get().load(weather.get("iconurl").toString()).resize(500, 500).into(imageView);
+                                    layout_weather.removeAllViews();
+                                    layout_weather.addView(weather_empty);
                                     layout_weather.addView(imageView);
                                     layout_weather.addView(textView);
                                     text_weather.setText(temperature +" degrees");
@@ -198,13 +207,15 @@ public class Handler extends Activity{
                         public void run() {
                             TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                             if (animerefresh){
-                                layout_anime.removeAllViewsInLayout();
+                                layout_anime.removeAllViews();
+
                                 Log.d(TAG, "run: ANIME: removed views" );
                                 animerefresh = false;
                             }
-                            Log.d(TAG, "run: width: " + width);
                             Picasso.get().load(anime.get("imagelink").toString()).into(imageView);
                             text_anime.setLayoutParams(showparams);
+                            layout_anime.removeAllViews();
+                            layout_anime.addView(anime_empty);
                             layout_anime.addView(imageView);
                             layout_anime.addView(textView);
                             text_anime.setText(anime.get("title").toString());

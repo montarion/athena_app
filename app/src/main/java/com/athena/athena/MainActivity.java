@@ -7,12 +7,9 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.DataSetObserver;
-import android.support.animation.DynamicAnimation;
-import android.support.animation.FlingAnimation;
+
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -20,15 +17,11 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.GestureDetector;
+
 import android.view.Gravity;
-import android.view.MotionEvent;
+
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
+
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -37,14 +30,10 @@ import java.util.Arrays;
 
 import static android.app.Notification.DEFAULT_VIBRATE;
 //TODO: figure out how to cut long text short gracefully(with trailing elipse)
-//TODO: figure out how to get location
 
 
 public class MainActivity extends AppCompatActivity {
     final String TAG = "main";
-    private GestureDetector gestureDetector;
-    public View vTouch;
-    calendarActivity calendar;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
     Handler handler;
@@ -57,9 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
     FrameLayout.LayoutParams hideparams;
     FrameLayout.LayoutParams showparams;
-
-
-    ExpandableListView expandableListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,16 +61,34 @@ public class MainActivity extends AppCompatActivity {
         final TextView calendar_head = findViewById(R.id.calendar_head);
         final LinearLayout mainlayout = findViewById(R.id.mainlayout);
 
+        TextView invisviewbase = findViewById(R.id.anime_empty);
+        FrameLayout.LayoutParams invisparams;
+        invisparams = new FrameLayout.LayoutParams(invisviewbase.getLayoutParams());
+        invisparams.gravity = Gravity.TOP;
+
+        final TextView anime_empty;
+        anime_empty = new TextView(context);
+        anime_empty.setTextSize(30);
+        anime_empty.setText("");
+        anime_empty.setVisibility(View.INVISIBLE);
+
+        final TextView weather_empty;
+        weather_empty = new TextView(context);
+        weather_empty.setTextSize(30);
+        weather_empty.setText("");
+        weather_empty.setVisibility(View.INVISIBLE);
+
+        final TextView calendar_empty;
+        calendar_empty = new TextView(context);
+        calendar_empty.setTextSize(30);
+        calendar_empty.setText("");
+        calendar_empty.setVisibility(View.INVISIBLE);
+
         hideparams = new FrameLayout.LayoutParams(anime_head.getLayoutParams());
         hideparams.gravity = Gravity.CENTER;
 
         showparams = new FrameLayout.LayoutParams(anime_head.getLayoutParams());
         showparams.gravity = Gravity.TOP;
-
-        Log.d(TAG, "onCreate: " + String.valueOf(expandableListView));
-        final ExpendableListViewAdapter expListAdapter = new ExpendableListViewAdapter(this.context);
-        //expListAdapter.childNames = new String[][]{{null, null},{"hey", "you"}};
-        //expandableListView.setAdapter(expListAdapter);
 
         n1 = new networking();
         n1.editor = editor;
@@ -110,6 +114,10 @@ public class MainActivity extends AppCompatActivity {
         handler.text_weather = weather_head;
         handler.card_calendar = calendar;
         handler.text_calendar = calendar_head;
+        handler.anime_empty = anime_empty;
+        handler.weather_empty = weather_empty;
+        handler.calendar_empty = calendar_empty;
+        handler.invisparams = invisparams;
 
         handler.animerefresh = animerefresh;
         handler.weatherrefresh = weatherrefresh;
