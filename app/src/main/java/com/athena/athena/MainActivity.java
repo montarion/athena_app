@@ -22,6 +22,7 @@ import android.view.Gravity;
 
 import android.view.View;
 
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     FrameLayout.LayoutParams hideparams;
     FrameLayout.LayoutParams showparams;
+    FrameLayout.LayoutParams fullscreenparams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +63,17 @@ public class MainActivity extends AppCompatActivity {
         final TextView calendar_head = findViewById(R.id.calendar_head);
         final LinearLayout mainlayout = findViewById(R.id.mainlayout);
 
-        TextView invisviewbase = findViewById(R.id.anime_empty);
         FrameLayout.LayoutParams invisparams;
-        invisparams = new FrameLayout.LayoutParams(invisviewbase.getLayoutParams());
+        invisparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         invisparams.gravity = Gravity.TOP;
+        ViewGroup v = (ViewGroup) mainlayout;
 
-        final TextView anime_empty;
-        anime_empty = new TextView(context);
-        anime_empty.setTextSize(30);
-        anime_empty.setText("");
-        anime_empty.setVisibility(View.INVISIBLE);
+
+        //final TextView anime_empty;
+        //anime_empty = new TextView(context);
+        //anime_empty.setTextSize(30);
+        //anime_empty.setText("");
+        //anime_empty.setVisibility(View.INVISIBLE);
 
         final TextView weather_empty;
         weather_empty = new TextView(context);
@@ -84,11 +87,15 @@ public class MainActivity extends AppCompatActivity {
         calendar_empty.setText("");
         calendar_empty.setVisibility(View.INVISIBLE);
 
-        hideparams = new FrameLayout.LayoutParams(anime_head.getLayoutParams());
+        hideparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         hideparams.gravity = Gravity.CENTER;
 
-        showparams = new FrameLayout.LayoutParams(anime_head.getLayoutParams());
+        showparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         showparams.gravity = Gravity.TOP;
+
+        fullscreenparams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
 
         n1 = new networking();
         n1.editor = editor;
@@ -97,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
         handler = new Handler();
         handler.context = this;
-
+        handler.v = v;
+        handler.notid = 0;
         handler.prefs = prefs;
         handler.editor = editor;
         handler.notiservice = getSystemService(NotificationManager.class);
@@ -105,16 +113,16 @@ public class MainActivity extends AppCompatActivity {
         handler.mainlayout = mainlayout;
         handler.showparams = showparams;
         handler.hideparams = hideparams;
-        handler.layout_anime = findViewById(R.id.anime_layout);
+        handler.fullscreenparams = fullscreenparams;
+
         handler.layout_weather = findViewById(R.id.weather_layout);
         handler.layout_calendar = findViewById(R.id.calendar_layout);
-        handler.card_anime = anime;
-        handler.text_anime = anime_head;
+        //handler.card_anime = anime;
+        //handler.text_anime = anime_head;
         handler.card_weather = weather;
         handler.text_weather = weather_head;
         handler.card_calendar = calendar;
         handler.text_calendar = calendar_head;
-        handler.anime_empty = anime_empty;
         handler.weather_empty = weather_empty;
         handler.calendar_empty = calendar_empty;
         handler.invisparams = invisparams;
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         handler.animerefresh = animerefresh;
         handler.weatherrefresh = weatherrefresh;
         handler.calendarrefresh = calendarrefresh;
+        handler.n1 = n1;
         n1.handler = handler;
         Intent intent = new Intent(this, networking.class);
 
@@ -136,62 +145,33 @@ public class MainActivity extends AppCompatActivity {
 
         NotificationChannel channel = new NotificationChannel("foreground service", "foreground service", NotificationManager.IMPORTANCE_MIN);
 
-        NotificationManager notificationManagercheck = getSystemService(NotificationManager.class);
-        notificationManagercheck.createNotificationChannel(channel);
-
-        //expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-        //    int previousItem = -1;
+        //NotificationManager notificationManagercheck = getSystemService(NotificationManager.class);
+        //notificationManagercheck.createNotificationChannel(channel);
 //
+        //anime.setOnClickListener(new View.OnClickListener() {
         //    @Override
-        //    public void onGroupExpand(int groupPosition) {
-        //        if(groupPosition != previousItem )
-        //            expandableListView.collapseGroup(previousItem);
-        //        previousItem = groupPosition;
+        //    public void onClick(View v) {
+        //        CardView topview = anime;
+//
+        //        View childview = topview.getChildAt(1);
+        //        TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+        //        if (childview.getVisibility() == View.GONE){
+        //            anime_head.setLayoutParams(showparams);
+        //            childview.setVisibility(View.VISIBLE);
+        //        } else {
+        //            anime_head.setLayoutParams(hideparams);
+        //            childview.setVisibility(View.GONE);
+        //        }
         //    }
         //});
-//
-        //expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//
+        //anime.setOnLongClickListener(new View.OnLongClickListener() {
         //    @Override
-        //    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-        //        String name = expListAdapter.groupNames[groupPosition];
-        //        Log.d(TAG, "onGroupClick: got touch from: " + name);
-        //        if (name.equals("Anime")){
-        //            networking.send("anime", "");
-        //        }
-        //        if(expandableListView.isGroupExpanded(groupPosition)){
-        //            expandableListView.collapseGroup(groupPosition);
-        //        } else {
-        //            expandableListView.expandGroup(groupPosition, true);
-        //        }
+        //    public boolean onLongClick(View v) {
+        //        Log.d(TAG, "onClick: " + v.getTag().toString());
+        //        networking.send("anime", "");
         //        return true;
-        //    };
+        //    }
         //});
-
-        anime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CardView topview = anime;
-
-                View childview = topview.getChildAt(1);
-                TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
-                if (childview.getVisibility() == View.GONE){
-                    anime_head.setLayoutParams(showparams);
-                    childview.setVisibility(View.VISIBLE);
-                } else {
-                    anime_head.setLayoutParams(hideparams);
-                    childview.setVisibility(View.GONE);
-                }
-            }
-        });
-        anime.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Log.d(TAG, "onClick: " + v.getTag().toString());
-                networking.send("anime", "");
-                return true;
-            }
-        });
 
         weather.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,6 +204,17 @@ public class MainActivity extends AppCompatActivity {
                 CardView topview = calendar;
                 Log.d(TAG, "onClick: " + v.getTag().toString());
                 View childview = topview.getChildAt(1);
+                int i = 0;
+                for (i = 0;i < calendar.getChildCount(); i++) {
+                    Log.i(TAG, "onMessage: calendar tags: " + calendar.getChildAt(i).getTag());
+                };
+                i=0;
+                LinearLayout calendar_layout = findViewById(R.id.calendar_layout);
+                for (i = 0;i < calendar_layout.getChildCount(); i++) {
+                    Log.i(TAG, "onMessage: calendar_layout tags: " + calendar_layout.getChildAt(i).getTag());
+                };
+                Log.d(TAG, "onClick: CALENDAR ONCLICK VIEW: " + childview.getTag());
+                Log.d(TAG, "onClick: " + String.valueOf(childview.getVisibility()));
                 TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                 if (childview.getVisibility() == View.GONE){
                     calendar_head.setLayoutParams(showparams);

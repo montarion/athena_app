@@ -1,5 +1,6 @@
 package com.athena.athena;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -8,6 +9,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
 import android.location.Criteria;
@@ -19,13 +22,16 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -37,12 +43,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 
 import static android.app.Notification.DEFAULT_VIBRATE;
 import static org.xmlpull.v1.XmlPullParser.TYPES;
@@ -77,21 +86,21 @@ public class Handler extends Activity{
     String category = "standard";
     NotificationManagerCompat notificationManager;
     Object notiservice;
-    int notid = 0;
+    int notid;
 
     //building UI
-    CardView card_anime;
+    ViewGroup v;
     CardView card_weather;
     CardView card_calendar;
     LinearLayout mainlayout;
-    LinearLayout layout_anime;
     LinearLayout layout_weather;
     LinearLayout layout_calendar;
 
     FrameLayout.LayoutParams hideparams;
     FrameLayout.LayoutParams showparams;
     FrameLayout.LayoutParams invisparams;
-    TextView anime_empty;
+    FrameLayout.LayoutParams fullscreenparams;
+    //TextView anime_empty;
     TextView weather_empty;
     TextView calendar_empty;
 
@@ -99,6 +108,8 @@ public class Handler extends Activity{
 
     int height;
     int width;
+
+    networking n1;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         final WindowManager w = (WindowManager) context
@@ -108,6 +119,8 @@ public class Handler extends Activity{
         d.getMetrics(displayMetrics);
         height = displayMetrics.heightPixels;
         width  = displayMetrics.widthPixels;
+        setContentView(R.layout.activity_main);
+
 
         //invisview.setLayoutParams(invisparams);
 
@@ -125,6 +138,9 @@ public class Handler extends Activity{
             String key = (String) entry.getKey();
             Object value = entry.getValue();
             Log.d(TAG, "call: Key = " + key + ", Value = " + value.toString());
+            //debug
+            Log.i(TAG, "RUN: mainlayout kids : " + mainlayout.getChildCount());
+
             if (key.equals("motd")) {
                 try {
                     Map<String, Object> motd = parseJSON(new ObjectMapper().writeValueAsString(response.get("motd")));
@@ -136,51 +152,137 @@ public class Handler extends Activity{
                         String skey = (String) sentry.getKey();
                         Log.d(TAG, "call: " + skey);
                         if (skey.equals("calendar")){
+                            if (v.findViewWithTag(skey+"_cardview") == null){
+                                Log.i(TAG, "run: mainlayout kids before: " + mainlayout.getChildCount());
+                                final CardView cardView = buildcard(skey);
+                                Log.i(TAG, "onMessage: cardview right before: " + cardView.getTag());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                                        Log.i(TAG, "run: cardview: " + cardView.getTag());
+                                        mainlayout.addView(cardView);
+                                        Log.i(TAG, "run: mainlayout is updated");
+
+                                        //v = (ViewGroup) cardView;
+                                    }});
+
+                                Log.i(TAG, "run: mainlayout kids after: " + mainlayout.getChildCount());
+                                Log.i(TAG, "run: mainlayout kids child 3: " + mainlayout.getChildAt(3));
+                                Log.d(TAG, "onMessage: CURRENTLY MAINLAYOUT HAS THIS NUMBER OF CHILDREN: " + mainlayout.getChildCount());
+                                int currentchildren =mainlayout.getChildCount();
+                                while (mainlayout.getChildCount() < currentchildren+1){
+                                }
+                            }
                             editor.putString("calendar", maptoJSON(motd.get("calendar")));
                             editor.commit();
+
+                            final CardView card = v.findViewWithTag(skey+"_cardview");
+                            ViewGroup v1 = (ViewGroup) card;
+                            final TextView headtext = v1.findViewWithTag(skey+"_headtext");
+                            final LinearLayout layout = v1.findViewWithTag(skey+"_layout");
+                            final TextView empty = v1.findViewWithTag(skey+"_empty");
                             final Map<String, Object> calendar = parseJSON(new ObjectMapper().writeValueAsString(motd.get("calendar")));
+                            Log.d(TAG, "onMessage: calendar: " + calendar);
+                            final String title = calendar.get("event").toString();
+                            final String cat = skey;
+
                             Log.d(TAG, "call: calendar" + calendar.toString());
                             Log.d(TAG, "call: calendar" + calendar.get("event"));
-                            final TextView textView = buildsubtext("Address is: " + calendar.get("location").toString());
+                            calendar_empty.setText(calendar.get("event").toString());
+
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                                     if (calendarrefresh) {
-                                        layout_calendar.removeAllViews();
+                                        layout.removeAllViews();
                                         calendarrefresh = false;
                                     }
-                                    text_calendar.setLayoutParams(showparams);
-                                    layout_calendar.removeAllViews();
-                                    layout_calendar.addView(calendar_empty);
-                                    layout_calendar.addView(textView);
-                                    text_calendar.setText(calendar.get("event").toString());
+                                    headtext.setLayoutParams(showparams);
+                                    layout.removeAllViews();
+                                    card.removeAllViews();
+                                    card.addView(headtext);
+                                    empty.setVisibility(View.INVISIBLE);
+                                    empty.setText(title);
+                                    layout.addView(empty);
+                                    if (calendar.containsKey("location")) {
+                                        TextView subText = buildtext("Address is: " + calendar.get("location").toString(), 20);
+                                        subText.setTag(cat+"+subtext");
+                                        layout.addView(subText);
+                                    }
+                                    headtext.setText(title);
+                                    card.addView(layout);
                                     calendarrefresh = true;
                                 }
                             });
                         }
                         if (skey.equals("weather")){
+
+                            if (v.findViewWithTag(skey+"_cardview") == null){
+                                Log.i(TAG, "run: mainlayout kids before: " + mainlayout.getChildCount());
+                                final CardView cardView = buildcard(skey);
+                                Log.i(TAG, "onMessage: cardview right before: " + cardView.getTag());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                                        Log.i(TAG, "run: cardview: " + cardView.getTag());
+                                        mainlayout.addView(cardView);
+                                        Log.i(TAG, "run: mainlayout is updated");
+
+                                        //v = (ViewGroup) cardView;
+                                    }});
+
+                                Log.i(TAG, "run: mainlayout kids after: " + mainlayout.getChildCount());
+                                Log.i(TAG, "run: mainlayout kids child 3: " + mainlayout.getChildAt(3));
+                                Log.d(TAG, "onMessage: CURRENTLY MAINLAYOUT HAS THIS NUMBER OF CHILDREN: " + mainlayout.getChildCount());
+                                int currentchildren =mainlayout.getChildCount();
+                                while (mainlayout.getChildCount() < currentchildren+1){
+                                }
+                            }
+
+
                             editor.putString("weather", maptoJSON(motd.get("weather")));
                             editor.commit();
+
+                            final CardView card = v.findViewWithTag(skey+"_cardview");
+
+                            Log.i(TAG, "onMessage: cardview card is: " + card);
+                            ViewGroup v1 = (ViewGroup) card;
+                            final TextView headtext = v1.findViewWithTag(skey+"_headtext");
+
+                            final LinearLayout layout = v1.findViewWithTag(skey+"_layout");
+                            final TextView empty = v1.findViewWithTag(skey+"_empty");
                             final Map<String, Object> weather = parseJSON(new ObjectMapper().writeValueAsString(motd.get("weather")));
                             final int temperature = Math.round(Float.valueOf(weather.get("temperature").toString()));
-                            final TextView textView = buildsubtext("Windspeed is: " + weather.get("windspeed").toString() + "km/h");
+                            final String title = temperature + " degrees";
+
+                            final TextView subText = buildtext("Windspeed is: " + weather.get("windspeed").toString() + "km/h", 20);
+                            subText.setTag(skey+"_subtext");
+
                             final ImageView imageView = new ImageView(context);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                                     if (weatherrefresh) {
-                                        layout_weather.removeAllViews();
+                                        layout.removeAllViews();
                                         weatherrefresh = false;
                                     }
-                                    text_weather.setLayoutParams(showparams);
+                                    headtext.setLayoutParams(showparams);
                                     Picasso.get().load(weather.get("iconurl").toString()).resize(500, 500).into(imageView);
-                                    layout_weather.removeAllViews();
-                                    layout_weather.addView(weather_empty);
-                                    layout_weather.addView(imageView);
-                                    layout_weather.addView(textView);
-                                    text_weather.setText(temperature +" degrees");
+                                    layout.removeAllViews();
+                                    card.removeAllViews();
+                                    card.addView(headtext);
+                                    empty.setVisibility(View.INVISIBLE);
+                                    empty.setText(title);
+                                    layout.addView(empty);
+                                    layout.addView(imageView);
+                                    layout.addView(subText);
+                                    headtext.setText(title);
+                                    card.addView(layout);
                                     weatherrefresh = true;
                                 }
                             });
@@ -193,37 +295,105 @@ public class Handler extends Activity{
             }
             if (key.equals("anime")){
                 try{
-                    final Map<String, Object> anime = parseJSON(new ObjectMapper().writeValueAsString(response.get("anime")));
-                    Log.d(TAG, "call THING: " + anime.toString());
+                    // first check if there's a card
+                    if (v.findViewWithTag(key+"_cardview") == null){
+                        Log.i(TAG, "run: mainlayout kids before: " + mainlayout.getChildCount());
+                        final CardView cardView = buildcard(key);
+                        Log.i(TAG, "onMessage: cardview right before: " + cardView.getTag());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                                Log.i(TAG, "run: cardview: " + cardView.getTag());
+                                mainlayout.addView(cardView);
+                                Log.i(TAG, "run: mainlayout is updated");
 
-                    Log.d(TAG, "call: anime" + anime.toString());
+                                //v = (ViewGroup) cardView;
+                            }});
+
+                        Log.i(TAG, "run: mainlayout kids after: " + mainlayout.getChildCount());
+                        Log.i(TAG, "run: mainlayout kids child 3: " + mainlayout.getChildAt(3));
+                        Log.d(TAG, "onMessage: CURRENTLY MAINLAYOUT HAS THIS NUMBER OF CHILDREN: " + mainlayout.getChildCount());
+                        int currentchildren =mainlayout.getChildCount();
+                        while (mainlayout.getChildCount() < currentchildren+1){
+                        }
+                    }
+                    // now there definitely is!
+                    // get vars
+                    //ViewGroup v = (ViewGroup) mainlayout;
+
+
+                    final CardView card = v.findViewWithTag(key+"_cardview");
+
+                    Log.i(TAG, "onMessage: cardview card is: " + card);
+                    ViewGroup v1 = (ViewGroup) card;
+                    final TextView headtext = v1.findViewWithTag(key+"_headtext");
+
+                    final LinearLayout layout = v1.findViewWithTag(key+"_layout");
+                    final TextView empty = v1.findViewWithTag(key+"_empty");
+                    final Map<String, Object> anime = parseJSON(new ObjectMapper().writeValueAsString(response.get("anime")));
+                    final String title = anime.get("title").toString();
+                    final String text = "You can watch episode " + anime.get("episode").toString() + " right now!";
                     editor.putString("title", anime.get("title").toString());
                     editor.putString("episode", anime.get("episode").toString());
                     editor.commit();
-                    final TextView textView = buildsubtext("It's episode: " + anime.get("episode").toString());
-                    final ImageView imageView = new ImageView(context);
+                    final String cat = key;
+                    final TextView subText = buildtext("It's episode: " + anime.get("episode").toString(), 20);
+                    subText.setTag(cat+"_subtext");
+
+                    final Bitmap image = Picasso.get().load(anime.get("imagelink").toString()).get();
+                    final int imageHeight = image.getHeight();
+                    final int imageWidth = image.getWidth();
+                    final float ratio = (float)imageWidth/imageHeight;
+                    final int newHeight = (int)(layout.getWidth() * (ratio*1.2));
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
                             if (animerefresh){
-                                layout_anime.removeAllViews();
-
-                                Log.d(TAG, "run: ANIME: removed views" );
+                                layout.removeAllViews();
                                 animerefresh = false;
                             }
-                            Picasso.get().load(anime.get("imagelink").toString()).into(imageView);
-                            text_anime.setLayoutParams(showparams);
-                            layout_anime.removeAllViews();
-                            layout_anime.addView(anime_empty);
-                            layout_anime.addView(imageView);
-                            layout_anime.addView(textView);
-                            text_anime.setText(anime.get("title").toString());
+
+                            Log.d(TAG, "run: height: " + imageHeight);
+                            Log.d(TAG, "run: width: " + imageWidth);
+                            Log.d(TAG, "run: thingwidth: " + layout.getWidth());
+                            Log.d(TAG, "run: ratio: " + ratio);
+                            Log.d(TAG, "run: newheight: " + newHeight);
+                            layout.removeAllViews();
+                            card.removeAllViews();
+                            ImageView imageView = new ImageView(context);
+                            imageView.setTag(cat+"_image");
+                            Log.i(TAG, "run: SET IMAGE VIEW: " + imageView.getTag());
+                            imageView.setVisibility(View.VISIBLE);
+                            imageView.setBackgroundResource(R.drawable.fade_image_background);
+                            Picasso.get().load(anime.get("imagelink").toString()).resize(layout.getWidth(), newHeight).into(imageView);
+
+
+                            headtext.setLayoutParams(showparams);
+                            FrameLayout.LayoutParams testparams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,600);
+
+
+                            headtext.setText(title);
+                            card.addView(headtext);
+                            empty.setVisibility(View.INVISIBLE);
+                            empty.setText(title);
+                            layout.addView(empty);
+                            layout.addView(imageView);
+                            layout.addView(subText);
+                            card.addView(layout);
+                            //layout.addView(imageView);
+
+
                             animerefresh = true;
                         }
                     });
+                    int currentchildren = layout.getChildCount();
+                    while (layout.getChildCount() < currentchildren+1){
+                    }
+
                 } catch (Exception e) {
-                    Log.e(TAG, "anime error: " + e.getMessage() + e.getCause());
+                    Log.e(TAG, "anime error: " + e.getMessage());
                 }
             }
             if (key.equals("location")) {
@@ -357,15 +527,115 @@ public class Handler extends Activity{
         return finalDateString;
     }
 
-    public TextView buildsubtext(String text){
+    public TextView buildtext(String text, int textsize){
         final TextView textView = new TextView(context);
         textView.setText(text);
-        textView.setTextSize(20);
+        textView.setTextSize(textsize);
         textView.setGravity(17);
+        textView.setGravity(Gravity.CENTER);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textView.setFocusable(false);
         return textView;
     }
 
+    public LinearLayout buildlinearlayout(){
+        final LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        // do fix animation
+        LayoutTransition lt = new LayoutTransition();
+        lt.enableTransitionType(LayoutTransition.CHANGING);
+        linearLayout.setLayoutTransition(lt);
+        return linearLayout;
+    }
+    public CardView buildcard(final String title){
+        String oldTAG = TAG;
+        TAG = "buildcard";
+        Log.i(TAG, "buildcard: started building: " + title);
+        // create main card
+        final CardView cardView = new CardView(context);
+        cardView.setTag(title+"_cardview");
+        cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardDark));
+        cardView.setMinimumHeight(70);
+        LinearLayout.LayoutParams cardViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        cardView.setLayoutParams(cardViewParams);
+        ViewGroup.MarginLayoutParams cardViewMarginParams = (ViewGroup.MarginLayoutParams) cardView.getLayoutParams();
+        cardViewMarginParams.setMargins(0, 5, 0, 5);
+        cardView.requestLayout();  //Dont forget this line
+
+        cardView.setCardElevation(40);
+        cardView.invalidate();
+        // add card to mainlayout
+        //mainlayout.addView(cardView);
+        Log.i(TAG, "buildcard: created card with tag: " + cardView.getTag());
+
+        // add head text
+        final TextView headtext = buildtext(title, 30);
+        headtext.setTag(title+"_headtext");
+        headtext.setGravity(Gravity.CENTER);
+        headtext.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        headtext.setVisibility(View.VISIBLE);
+        // add headtext to card
+        cardView.addView(headtext);
+        Log.i(TAG, "buildcard: added head text with tag: " + headtext.getTag());
+
+        // add linearview
+        final LinearLayout linearLayout = buildlinearlayout();
+        linearLayout.setTag(title+"_layout");
+
+
+        // add layout to card
+        cardView.addView(linearLayout);
+        Log.i(TAG, "buildcard: created linear layout with tag: " + linearLayout.getTag());
+        //add empty text
+        TextView emptytext = buildtext("hey there!", 30);
+        emptytext.setTag(title+"_empty");
+        emptytext.setGravity(Gravity.CENTER_VERTICAL);
+        emptytext.setVisibility(View.VISIBLE);
+        Log.i(TAG, "buildcard: created empty text with tag: " + emptytext.getTag());
+        // add empty text to layout
+        linearLayout.addView(emptytext);
+        linearLayout.setElevation(4);
+
+        // do the click listeners
+        Log.i(TAG, "buildcard: adding click listeners");
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TransitionManager.beginDelayedTransition(mainlayout, new AutoTransition());
+                //View childview = linearLayout;
+                View childview = cardView.getChildAt(1);
+                Log.i(TAG, "onClick: CHILDVIEW TAG: " + childview.getTag());
+                String currenttarget = v.getTag().toString().split("_")[0];
+
+
+
+                if (childview.getVisibility() == View.GONE){
+                    Log.i(TAG, "onClick: showing: " + currenttarget);
+                    headtext.setLayoutParams(showparams);
+                    headtext.setGravity(Gravity.TOP);
+                    childview.setVisibility(View.VISIBLE);
+
+                } else {
+                    Log.i(TAG, "onClick: hiding: " + currenttarget);
+                    headtext.setLayoutParams(hideparams);
+                    childview.setVisibility(View.GONE);
+                }
+            }
+        });
+        cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d(TAG, "onClick: " + v.getTag().toString());
+                networking.send(title, "");
+                return true;
+            }
+        });
+        Log.i(TAG, "buildcard: added click listeners.");
+    TAG = oldTAG;
+        Log.i(TAG, "buildcard: cardview: " + cardView.getTag());
+    return cardView;
+    }
 
 }
 

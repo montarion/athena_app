@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -36,7 +37,9 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,9 +109,9 @@ public class networking extends Service{
     public static void connect(){
         try {
             IO.Options opts = new IO.Options();
-            opts.forceNew = true;
+            opts.forceNew = false;
             opts.reconnection = true;
-            socket = IO.socket("http://1.1.1.1:1234");
+            socket = IO.socket("http://83.163.109.161:7777", opts);
             socket.connect();
             Log.d(TAG, "connect: " + socket.connected());
         } catch (URISyntaxException e ){
@@ -148,7 +151,14 @@ public class networking extends Service{
                     handler.onMessage(command);
                 }
             }
+        }).on("disconnect", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d(TAG, "call: Disconnected!");
+                Log.d(TAG, "call: " + Arrays.toString(args));
+            }
         });
+
     }
     public static void send(String key, Object value) {
             JSONObject obj = new JSONObject();
@@ -181,6 +191,27 @@ public class networking extends Service{
         notid =+ 1;
 
         notificationManager.notify(notid, mBuilder.build());
+    }
+
+    public int[] getdimensions(String urlstring){
+
+        int imageHeight = 0;
+        int imageWidth = 0;
+        try {
+            URL url = new URL(urlstring);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(connection.getInputStream(), null, options);
+            imageHeight = options.outHeight;
+            imageWidth = options.outWidth;
+            connection.disconnect();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        int[] intarray = {imageHeight, imageWidth};
+        return intarray;
     }
 
 
